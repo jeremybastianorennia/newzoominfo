@@ -1,0 +1,123 @@
+<!-- Only modified segments shown for brevity, full file regenerated below -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZoomInfo Account Filter Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>ZoomInfo Account Filter Dashboard</h1>
+            <p class="subtitle">Filter and analyze enriched ZoomInfo account data to identify and qualify prospects</p>
+        </header>
+
+        <!-- Filter Controls -->
+        <section class="filters-section">
+            <div class="filters-grid">
+                <!-- Revenue Filter -->
+                <div class="card filter-card">
+                    <h3>Revenue Range</h3>
+                    <div class="form-group">
+                        <select id="revenueFilter" class="form-control" multiple size="6">
+                            <option value="Under $500,000">Under $500,000</option>
+                            <option value="$500,000 - $1 mil.">$500,000 - $1 mil.</option>
+                            <option value="$1 mil. - $5 mil.">$1 mil. - $5 mil.</option>
+                            <option value="$5 mil. - $10 mil.">$5 mil. - $10 mil.</option>
+                            <option value="$10 mil. - $25 mil.">$10 mil. - $25 mil.</option>
+                            <option value="$25 mil. - $50 mil.">$25 mil. - $50 mil.</option>
+                            <option value="$50 mil. - $100 mil.">$50 mil. - $100 mil.</option>
+                            <option value="$100 mil. - $250 mil.">$100 mil. - $250 mil.</option>
+                            <option value="$250 mil. - $500 mil.">$250 mil. - $500 mil.</option>
+                            <option value="$500 mil. - $1 bil.">$500 mil. - $1 bil.</option>
+                            <option value="Over $5 bil.">Over $5 bil.</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Employee Count Filter -->
+                <div class="card filter-card">
+                    <h3>Employee Count</h3>
+                    <div class="employee-inputs">
+                        <div class="form-group">
+                            <label class="form-label" for="minEmployees">Min Employees</label>
+                            <input type="number" id="minEmployees" class="form-control" placeholder="0" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="maxEmployees">Max Employees</label>
+                            <input type="number" id="maxEmployees" class="form-control" placeholder="Unlimited" min="0">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location Filter -->
+                <div class="card filter-card">
+                    <h3>Location (City)</h3>
+                    <div class="form-group">
+                        <select id="locationFilter" class="form-control" multiple size="6">
+                            <!-- Options populated by JavaScript -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="card filter-card">
+                    <h3>Actions</h3>
+                    <div class="action-buttons">
+                        <button id="clearFilters" class="btn btn--secondary btn--full-width">Clear Filters</button>
+                        <button id="exportData" class="btn btn--primary btn--full-width">Export Data</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Search and Results -->
+        <section class="results-section">
+            <div class="card">
+                <div class="card__header">
+                    <div class="results-header">
+                        <h2>Account Results</h2>
+                        <div class="results-count">
+                            <span id="resultsCount">0 accounts found</span>
+                        </div>
+                    </div>
+                    <div class="search-container">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search within results...">
+                    </div>
+                </div>
+                <div class="card__body">
+                    <div class="table-container">
+                        <table id="resultsTable" class="results-table">
+                            <thead>
+                                <tr>
+                                    <th data-sort="Company Name">Company Name <span class="sort-indicator"></span></th>
+                                    <th data-sort="Revenue Range (in USD)">Revenue Range <span class="sort-indicator"></span></th>
+                                    <th data-sort="Employees">Employees <span class="sort-indicator"></span></th>
+                                    <th data-sort="Location">Location <span class="sort-indicator"></span></th>
+                                    <th data-sort="Primary Industry">Industry <span class="sort-indicator"></span></th>
+                                    <th data-sort="Company HQ Phone">Phone <span class="sort-indicator"></span></th>
+                                    <th data-sort="Website">Website <span class="sort-indicator"></span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultsBody">
+                                <!-- Results populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="loading hidden">
+            <div class="loading-spinner"></div>
+            <p>Filtering results...</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

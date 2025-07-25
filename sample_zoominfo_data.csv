@@ -1,0 +1,6 @@
+Company Name,Domain,Industry,Employee Count,Revenue,Location,Country,Phone,Technologies Used,Founded Year,ZoomInfo Score,Lead Score,Account Type
+Acme Corp,acmecorp.com,Manufacturing,500,$50M - $100M,"New York, NY",United States,+1-555-0123,"Salesforce, Microsoft Office",1995,85,Hot,Enterprise
+TechStart Inc,techstart.com,Technology,150,$10M - $50M,"San Francisco, CA",United States,+1-555-0456,"AWS, React, Node.js",2018,72,Warm,Mid-Market
+Global Solutions,globalsolutions.com,Consulting,1200,$100M - $500M,"Chicago, IL",United States,+1-555-0789,"Oracle, SAP",1987,91,Hot,Enterprise
+Innovation Labs,innovationlabs.com,Research & Development,75,$1M - $10M,"Austin, TX",United States,+1-555-0321,"Python, TensorFlow",2020,68,Cold,SMB
+DataTech Systems,datatechsys.com,Software,300,$50M - $100M,"Seattle, WA",United States,+1-555-0654,"Azure, .NET",2010,79,Warm,Mid-Market
