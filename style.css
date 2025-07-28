@@ -1,5 +1,18 @@
+
 :root {
   /* Primitive Color Tokens */
+
+  :root {
+  --brand-teal: #00BDBF;
+  --brand-blue: #0080FF;
+  --brand-white: #FFFFFF;
+  --brand-black: #000000;
+  --brand-green: #09A858;
+  --brand-orange: #FFB01D;
+  --brand-yellow: #FFEB00;
+  --brand-pink: #F4C0E3;
+}
+
   --color-white: rgba(255, 255, 255, 1);
   --color-black: rgba(0, 0, 0, 1);
   --color-cream-50: rgba(252, 252, 249, 1);
