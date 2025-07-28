@@ -6,6 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ZoomInfo Account Filter Dashboard</title>
     <link rel="stylesheet" href="style.css">
+
+    <script>
+  // Change this to your desired password
+  const correctPassword = "flames";
+
+  const enteredPassword = prompt("This dashboard is protected. Please enter the password:");
+
+  if (enteredPassword !== correctPassword) {
+    alert("Incorrect password. You will be redirected.");
+    window.location.href = "https://www.google.com"; // redirect if password is wrong
+  }
+</script>
+
 </head>
 <body>
     <div class="container">
