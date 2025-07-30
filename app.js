@@ -337,8 +337,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Populate location filter with unique cities
 function populateLocationFilter() {
-    const uniqueCities = [...new Set(zoomInfoData.map(item => item['Company City']))].sort();
-    locationFilter.innerHTML = ''; // Clear first
+    // Extract cities from "Head Office" field (format: "City, State")
+    const uniqueCities = [...new Set(zoomInfoData.map(item => {
+        const headOffice = item['Head Office'] || '';
+        return headOffice.split(',')[0].trim(); // Get just the city part
+    }))].filter(city => city).sort();
+    
+    locationFilter.innerHTML = '';
     
     uniqueCities.forEach(city => {
         const option = document.createElement('option');
@@ -377,27 +382,30 @@ function handleFilterChange() {
 
 // Apply all active filters to the data
 function applyAllFilters() {
-    let data = [...zoomInfoData]; // Start fresh each time
+    let data = [...zoomInfoData];
 
-    // Revenue filter
+    // Revenue filter - use correct field name
     const selectedRevenues = getSelectedOptions(revenueFilter);
     if (selectedRevenues.length > 0) {
-        data = data.filter(item => selectedRevenues.includes(item['Revenue Range (in USD)']));
+        data = data.filter(item => selectedRevenues.includes(item['Revenue Estimate']));
     }
 
-    // Employee count filter
+    // Employee count filter - use correct field name
     const minEmployees = parseInt(minEmployeesInput.value) || 0;
     const maxEmployees = parseInt(maxEmployeesInput.value) || Number.MAX_SAFE_INTEGER;
     
     data = data.filter(item => {
-        const empCount = item.Employees;
+        const empCount = item['# of Employees']; // Correct field name
         return empCount >= minEmployees && empCount <= maxEmployees;
     });
 
-    // Location filter
+    // Location filter - extract city from Head Office
     const selectedCities = getSelectedOptions(locationFilter);
     if (selectedCities.length > 0) {
-        data = data.filter(item => selectedCities.includes(item['Company City']));
+        data = data.filter(item => {
+            const city = item['Head Office'].split(',')[0].trim();
+            return selectedCities.includes(city);
+        });
     }
 
     // Search filter
@@ -409,6 +417,14 @@ function applyAllFilters() {
             );
         });
     }
+
+    filteredData = data;
+
+    if (currentSortColumn) {
+        applySorting();
+    }
+}
+
 
     filteredData = data;
 
@@ -522,7 +538,6 @@ filteredData.forEach(item => {
     const row = document.createElement('tr');
     const website = item.Website.startsWith('http') ? item.Website : `https://${item.Website}`;
     const linkedinURL = item.LinkedinURL || '#';
-    const headOffice = `${item['Company City']}, ${item['Company State']}` || item['Head Office'];
     
     row.innerHTML = `
         <td><strong>${escapeHtml(item['Company Name'])}</strong></td>
@@ -533,19 +548,15 @@ filteredData.forEach(item => {
         <td>${escapeHtml(item['Drop Notes'] || '')}</td>
         <td><a href="${website}" target="_blank">${escapeHtml(item.Website)}</a></td>
         <td>${item.LinkedinURL ? `<a href="${linkedinURL}" target="_blank">LinkedIn</a>` : 'N/A'}</td>
-        <td><span class="${getRevenueClass(item['Revenue Estimate'] || item['Revenue Range (in USD)'])}">${escapeHtml(item['Revenue Estimate'] || item['Revenue Range (in USD)'])}</span></td>
-        <td>${(item['# of Employees'] || item.Employees).toLocaleString()}</td>
-        <td>${escapeHtml(headOffice)}</td>
-        <td>${escapeHtml(item.Country || item['Company Country'])}</td>
+        <td><span class="${getRevenueClass(item['Revenue Estimate'])}">${escapeHtml(item['Revenue Estimate'])}</span></td>
+        <td>${item['# of Employees'].toLocaleString()}</td>
+        <td>${escapeHtml(item['Head Office'])}</td>
+        <td>${escapeHtml(item.Country)}</td>
         <td><span class="status status--success">${escapeHtml(item.Segmentation || 'N/A')}</span></td>
     `;
     resultsBody.appendChild(row);
 });
 
-
-    updateResultsCount(filteredData.length);
-    highlightSearchTerms();
-}
 
 // Export current filtered data to CSV
 function exportToCSV() {
@@ -554,25 +565,28 @@ function exportToCSV() {
         return;
     }
 
-const headers = [
-    'Company Name', 'Assigned To', 'Account Type', 'Prospect Score', 'Account Notes', 
-    'Drop Notes', 'Website', 'LinkedIn URL', 'Revenue Estimate', 'Employees', 
-    'Head Office', 'Country', 'Segmentation'
-];
+    const headers = [
+        'Company Name', 'Assigned To', 'Account Type', 'Prospect Score', 'Account Notes', 
+        'Drop Notes', 'Website', 'LinkedIn URL', 'Revenue Estimate', 'Employees', 
+        'Head Office', 'Country', 'Segmentation'
+    ];
 
     const csvRows = [
         headers.join(','),
         ...filteredData.map(item => [
             `"${item['Company Name']}"`,
-            `"${item['Revenue Range (in USD)']}"`,
-            item.Employees,
-            `"${item['Company City']}"`,
-            `"${item['Company State']}"`,
-            `"${item['Primary Industry']}"`,
-            `"${item['Company HQ Phone']}"`,
+            `"${item['Who it is assigned to']}"`,
+            `"${item['Account Type']}"`,
+            item['Prospect Score'],
+            `"${item['Account Notes']}"`,
+            `"${item['Drop Notes']}"`,
             `"${item.Website}"`,
-            item['Founded Year'],
-            `"${item['Full Address']}"`
+            `"${item.LinkedinURL}"`,
+            `"${item['Revenue Estimate']}"`,
+            item['# of Employees'],
+            `"${item['Head Office']}"`,
+            `"${item.Country}"`,
+            `"${item.Segmentation}"`
         ].join(','))
     ];
 
@@ -586,6 +600,7 @@ const headers = [
     link.click();
     document.body.removeChild(link);
 }
+
 
 // Update the results count display
 function updateResultsCount(count) {
