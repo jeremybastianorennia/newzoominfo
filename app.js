@@ -317,6 +317,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Clear table
     tbody.innerHTML = '';
+
+  // Get CSS class for prospect score styling - Updated for color gradient
+function getScoreClass(score) {
+    if (score >= 90) return 'score-excellent';      // Dark green
+    else if (score >= 80) return 'score-very-good'; // Green  
+    else if (score >= 70) return 'score-good';      // Light green
+    else if (score >= 60) return 'score-fair';      // Yellow
+    else if (score >= 50) return 'score-poor';      // Orange
+    else if (score >= 40) return 'score-very-poor'; // Red-orange
+    else return 'score-critical';                   // Dark red
+}
+
     
     // Add each row
     zoomInfoData.forEach(item => {
