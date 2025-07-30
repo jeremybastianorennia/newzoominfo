@@ -1094,3 +1094,82 @@ select[multiple]:focus {
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-sm);
 }
+
+/* Prospect Score Color Coding - Green (high) to Red (low) */
+.score-excellent {
+    background-color: #22C55E;  /* Dark green */
+    color: white;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+    display: inline-block;
+    min-width: 30px;
+    text-align: center;
+}
+
+.score-very-good {
+    background-color: #16A34A;  /* Green */
+    color: white;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+    display: inline-block;
+    min-width: 30px;
+    text-align: center;
+}
+
+.score-good {
+    background-color: #65A30D;  /* Light green */
+    color: white;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+    display: inline-block;
+    min-width: 30px;
+    text-align: center;
+}
+
+.score-fair {
+    background-color: #EAB308;  /* Yellow */
+    color: var(--brand-black);
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+    display: inline-block;
+    min-width: 30px;
+    text-align: center;
+}
+
+.score-poor {
+    background-color: #F97316;  /* Orange */
+    color: white;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+    display: inline-block;
+    min-width: 30px;
+    text-align: center;
+}
+
+.score-very-poor {
+    background-color: #EF4444;  /* Red-orange */
+    color: white;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+    display: inline-block;
+    min-width: 30px;
+    text-align: center;
+}
+
+.score-critical {
+    background-color: #DC2626;  /* Dark red */
+    color: white;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+    display: inline-block;
+    min-width: 30px;
+    text-align: center;
+}
+
