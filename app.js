@@ -302,8 +302,6 @@ const zoomInfoData = [
   }
 ];
 
-
-// Global variables
 let filteredData = [...zoomInfoData];
 let currentSortColumn = null;
 let currentSortDirection = 'asc';
@@ -314,6 +312,8 @@ let revenueFilter, minEmployeesInput, maxEmployeesInput, locationFilter,
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('App starting, data length:', zoomInfoData.length);
+    
     // Initialize DOM elements
     revenueFilter = document.getElementById('revenueFilter');
     minEmployeesInput = document.getElementById('minEmployees');
@@ -332,15 +332,15 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize with all data visible
     filteredData = [...zoomInfoData];
+    console.log('Filtered data length:', filteredData.length);
     renderTable();
 });
 
 // Populate location filter with unique cities
 function populateLocationFilter() {
-    // Extract cities from "Head Office" field (format: "City, State")
     const uniqueCities = [...new Set(zoomInfoData.map(item => {
         const headOffice = item['Head Office'] || '';
-        return headOffice.split(',')[0].trim(); // Get just the city part
+        return headOffice.split(',')[0].trim();
     }))].filter(city => city).sort();
     
     locationFilter.innerHTML = '';
@@ -380,26 +380,26 @@ function handleFilterChange() {
     }, 50);
 }
 
-// Apply all active filters to the data
+// Apply all active filters to the data - FIXED VERSION
 function applyAllFilters() {
     let data = [...zoomInfoData];
 
-    // Revenue filter - use correct field name
+    // Revenue filter
     const selectedRevenues = getSelectedOptions(revenueFilter);
     if (selectedRevenues.length > 0) {
         data = data.filter(item => selectedRevenues.includes(item['Revenue Estimate']));
     }
 
-    // Employee count filter - use correct field name
+    // Employee count filter
     const minEmployees = parseInt(minEmployeesInput.value) || 0;
     const maxEmployees = parseInt(maxEmployeesInput.value) || Number.MAX_SAFE_INTEGER;
     
     data = data.filter(item => {
-        const empCount = item['# of Employees']; // Correct field name
+        const empCount = item['# of Employees'];
         return empCount >= minEmployees && empCount <= maxEmployees;
     });
 
-    // Location filter - extract city from Head Office
+    // Location filter
     const selectedCities = getSelectedOptions(locationFilter);
     if (selectedCities.length > 0) {
         data = data.filter(item => {
@@ -425,15 +425,6 @@ function applyAllFilters() {
     }
 }
 
-
-    filteredData = data;
-
-    // Apply sort if active
-    if (currentSortColumn) {
-        applySorting();
-    }
-}
-
 // Get selected options from a multi-select element
 function getSelectedOptions(selectElement) {
     return Array.from(selectElement.selectedOptions).map(option => option.value);
@@ -441,19 +432,16 @@ function getSelectedOptions(selectElement) {
 
 // Clear all filters and reset to initial state
 function clearAllFilters() {
-    // Clear all form inputs
     revenueFilter.selectedIndex = -1;
     locationFilter.selectedIndex = -1;
     minEmployeesInput.value = '';
     maxEmployeesInput.value = '';
     searchInput.value = '';
     
-    // Reset sort state
     currentSortColumn = null;
     currentSortDirection = 'asc';
     updateSortIndicators();
     
-    // Reset to full dataset
     filteredData = [...zoomInfoData];
     renderTable();
 }
@@ -472,24 +460,25 @@ function sortTable(column) {
     updateSortIndicators();
 }
 
-// Apply current sorting to filtered data
+// Apply current sorting to filtered data - FIXED VERSION
 function applySorting() {
     filteredData.sort((a, b) => {
         let aVal, bVal;
 
-        if (currentSortColumn === 'Location') {
-            aVal = `${a['Company City']}, ${a['Company State']}`;
-            bVal = `${b['Company City']}, ${b['Company State']}`;
+        // Handle special field mappings
+        if (currentSortColumn === '# of Employees') {
+            aVal = Number(a['# of Employees']);
+            bVal = Number(b['# of Employees']);
+        } else if (currentSortColumn === 'Prospect Score') {
+            aVal = Number(a['Prospect Score']);
+            bVal = Number(b['Prospect Score']);
         } else {
             aVal = a[currentSortColumn];
             bVal = b[currentSortColumn];
         }
 
-        // Numeric comparison for employees
-        if (currentSortColumn === 'Employees') {
-            aVal = Number(aVal);
-            bVal = Number(bVal);
-        } else if (typeof aVal === 'string') {
+        // String comparison
+        if (typeof aVal === 'string' && typeof bVal === 'string') {
             aVal = aVal.toLowerCase();
             bVal = bVal.toLowerCase();
         }
@@ -514,16 +503,21 @@ function updateSortIndicators() {
     }
 }
 
-// Render the data table
+// Render the data table - FIXED VERSION
 function renderTable() {
-    if (!resultsBody) return;
+    console.log('renderTable called, filteredData length:', filteredData.length);
+    
+    if (!resultsBody) {
+        console.log('resultsBody not found!');
+        return;
+    }
     
     resultsBody.innerHTML = '';
 
     if (filteredData.length === 0) {
         resultsBody.innerHTML = `
             <tr>
-                <td colspan="7" class="no-results">
+                <td colspan="13" class="no-results">
                     <h3>No accounts found</h3>
                     <p>Try adjusting your filters to see more results.</p>
                 </td>
@@ -533,30 +527,32 @@ function renderTable() {
         return;
     }
 
-// In renderTable() function, replace this block:
-filteredData.forEach(item => {
-    const row = document.createElement('tr');
-    const website = item.Website.startsWith('http') ? item.Website : `https://${item.Website}`;
-    const linkedinURL = item.LinkedinURL || '#';
-    
-    row.innerHTML = `
-        <td><strong>${escapeHtml(item['Company Name'])}</strong></td>
-        <td>${escapeHtml(item['Who it is assigned to'] || 'Unassigned')}</td>
-        <td><span class="status status--info">${escapeHtml(item['Account Type'] || 'N/A')}</span></td>
-        <td><span class="${getScoreClass(item['Prospect Score'])}">${item['Prospect Score'] || 'N/A'}</span></td>
-        <td>${escapeHtml(item['Account Notes'] || '')}</td>
-        <td>${escapeHtml(item['Drop Notes'] || '')}</td>
-        <td><a href="${website}" target="_blank">${escapeHtml(item.Website)}</a></td>
-        <td>${item.LinkedinURL ? `<a href="${linkedinURL}" target="_blank">LinkedIn</a>` : 'N/A'}</td>
-        <td><span class="${getRevenueClass(item['Revenue Estimate'])}">${escapeHtml(item['Revenue Estimate'])}</span></td>
-        <td>${item['# of Employees'].toLocaleString()}</td>
-        <td>${escapeHtml(item['Head Office'])}</td>
-        <td>${escapeHtml(item.Country)}</td>
-        <td><span class="status status--success">${escapeHtml(item.Segmentation || 'N/A')}</span></td>
-    `;
-    resultsBody.appendChild(row);
-});
+    filteredData.forEach(item => {
+        const row = document.createElement('tr');
+        const website = item.Website.startsWith('http') ? item.Website : `https://${item.Website}`;
+        const linkedinURL = item.LinkedinURL || '#';
+        
+        row.innerHTML = `
+            <td><strong>${escapeHtml(item['Company Name'])}</strong></td>
+            <td>${escapeHtml(item['Who it is assigned to'] || 'Unassigned')}</td>
+            <td><span class="status status--info">${escapeHtml(item['Account Type'] || 'N/A')}</span></td>
+            <td><span class="${getScoreClass(item['Prospect Score'])}">${item['Prospect Score'] || 'N/A'}</span></td>
+            <td>${escapeHtml(item['Account Notes'] || '')}</td>
+            <td>${escapeHtml(item['Drop Notes'] || '')}</td>
+            <td><a href="${website}" target="_blank">${escapeHtml(item.Website)}</a></td>
+            <td>${item.LinkedinURL ? `<a href="${linkedinURL}" target="_blank">LinkedIn</a>` : 'N/A'}</td>
+            <td><span class="${getRevenueClass(item['Revenue Estimate'])}">${escapeHtml(item['Revenue Estimate'])}</span></td>
+            <td>${item['# of Employees'].toLocaleString()}</td>
+            <td>${escapeHtml(item['Head Office'])}</td>
+            <td>${escapeHtml(item.Country)}</td>
+            <td><span class="status status--success">${escapeHtml(item.Segmentation || 'N/A')}</span></td>
+        `;
+        resultsBody.appendChild(row);
+    });
 
+    updateResultsCount(filteredData.length);
+    highlightSearchTerms();
+}
 
 // Export current filtered data to CSV
 function exportToCSV() {
@@ -601,7 +597,6 @@ function exportToCSV() {
     document.body.removeChild(link);
 }
 
-
 // Update the results count display
 function updateResultsCount(count) {
     if (resultsCount) {
@@ -632,6 +627,13 @@ function getRevenueClass(revenue) {
     } else if (revenue.includes('$50 mil.') || revenue.includes('$25 mil.')) {
         return 'revenue-medium';
     }
+    return 'revenue-low';
+}
+
+// Get CSS class for prospect score styling
+function getScoreClass(score) {
+    if (score >= 80) return 'revenue-high';
+    else if (score >= 60) return 'revenue-medium';
     return 'revenue-low';
 }
 
@@ -678,20 +680,3 @@ function escapeHtml(text) {
 function escapeRegex(string) {
     return String(string).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
-// Get CSS class for prospect score styling
-function getScoreClass(score) {
-    if (score >= 80) return 'revenue-high';
-    else if (score >= 60) return 'revenue-medium';
-    return 'revenue-low';
-}
-// Add these to your filter setup
-function populateAccountTypeFilter() {
-    const uniqueTypes = [...new Set(zoomInfoData.map(item => item['Account Type']).filter(Boolean))].sort();
-    // Create select options for Account Type filter
-}
-
-function populateSegmentationFilter() {
-    const uniqueSegments = [...new Set(zoomInfoData.map(item => item.Segmentation).filter(Boolean))].sort();
-    // Create select options for Segmentation filter
-}
-
