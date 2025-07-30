@@ -496,22 +496,31 @@ function renderTable() {
         return;
     }
 
-    filteredData.forEach(item => {
-        const row = document.createElement('tr');
-        const location = `${item['Company City']}, ${item['Company State']}`;
-        const website = item.Website.startsWith('http') ? item.Website : `https://${item.Website}`;
-        
-        row.innerHTML = `
-            <td><strong>${escapeHtml(item['Company Name'])}</strong></td>
-            <td><span class="${getRevenueClass(item['Revenue Range (in USD)'])}">${escapeHtml(item['Revenue Range (in USD)'])}</span></td>
-            <td>${item.Employees.toLocaleString()}</td>
-            <td>${escapeHtml(location)}</td>
-            <td>${escapeHtml(item['Primary Industry'])}</td>
-            <td>${escapeHtml(item['Company HQ Phone'])}</td>
-            <td><a href="${website}" target="_blank">${escapeHtml(item.Website)}</a></td>
-        `;
-        resultsBody.appendChild(row);
-    });
+// In renderTable() function, replace this block:
+filteredData.forEach(item => {
+    const row = document.createElement('tr');
+    const website = item.Website.startsWith('http') ? item.Website : `https://${item.Website}`;
+    const linkedinURL = item.LinkedinURL || '#';
+    const headOffice = `${item['Company City']}, ${item['Company State']}` || item['Head Office'];
+    
+    row.innerHTML = `
+        <td><strong>${escapeHtml(item['Company Name'])}</strong></td>
+        <td>${escapeHtml(item['Who it is assigned to'] || 'Unassigned')}</td>
+        <td><span class="status status--info">${escapeHtml(item['Account Type'] || 'N/A')}</span></td>
+        <td><span class="${getScoreClass(item['Prospect Score'])}">${item['Prospect Score'] || 'N/A'}</span></td>
+        <td>${escapeHtml(item['Account Notes'] || '')}</td>
+        <td>${escapeHtml(item['Drop Notes'] || '')}</td>
+        <td><a href="${website}" target="_blank">${escapeHtml(item.Website)}</a></td>
+        <td>${item.LinkedinURL ? `<a href="${linkedinURL}" target="_blank">LinkedIn</a>` : 'N/A'}</td>
+        <td><span class="${getRevenueClass(item['Revenue Estimate'] || item['Revenue Range (in USD)'])}">${escapeHtml(item['Revenue Estimate'] || item['Revenue Range (in USD)'])}</span></td>
+        <td>${(item['# of Employees'] || item.Employees).toLocaleString()}</td>
+        <td>${escapeHtml(headOffice)}</td>
+        <td>${escapeHtml(item.Country || item['Company Country'])}</td>
+        <td><span class="status status--success">${escapeHtml(item.Segmentation || 'N/A')}</span></td>
+    `;
+    resultsBody.appendChild(row);
+});
+
 
     updateResultsCount(filteredData.length);
     highlightSearchTerms();
@@ -524,10 +533,11 @@ function exportToCSV() {
         return;
     }
 
-    const headers = [
-        'Company Name', 'Revenue Range', 'Employees', 'City', 'State', 
-        'Industry', 'Phone', 'Website', 'Founded Year', 'Full Address'
-    ];
+const headers = [
+    'Company Name', 'Assigned To', 'Account Type', 'Prospect Score', 'Account Notes', 
+    'Drop Notes', 'Website', 'LinkedIn URL', 'Revenue Estimate', 'Employees', 
+    'Head Office', 'Country', 'Segmentation'
+];
 
     const csvRows = [
         headers.join(','),
@@ -632,3 +642,20 @@ function escapeHtml(text) {
 function escapeRegex(string) {
     return String(string).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
+// Get CSS class for prospect score styling
+function getScoreClass(score) {
+    if (score >= 80) return 'revenue-high';
+    else if (score >= 60) return 'revenue-medium';
+    return 'revenue-low';
+}
+// Add these to your filter setup
+function populateAccountTypeFilter() {
+    const uniqueTypes = [...new Set(zoomInfoData.map(item => item['Account Type']).filter(Boolean))].sort();
+    // Create select options for Account Type filter
+}
+
+function populateSegmentationFilter() {
+    const uniqueSegments = [...new Set(zoomInfoData.map(item => item.Segmentation).filter(Boolean))].sort();
+    // Create select options for Segmentation filter
+}
+
