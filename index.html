@@ -1,40 +1,35 @@
-<!-- Only modified segments shown for brevity, full file regenerated below -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TAM Dashboard</title>
+
+    <!-- Custom Styles -->
     <link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.6.1/nouislider.min.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.6.1/nouislider.min.js"></script>
+    <!-- noUiSlider Styles -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.6.1/nouislider.min.css" />
+    <!-- noUiSlider JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.6.1/nouislider.min.js"></script>
 
+    <!-- Password protection script in the HEAD is OK for this approach -->
     <script>
-const correctPassword = "flames";
-
-function checkPassword() {
-    const enteredPassword = prompt("This dashboard is protected. Please enter the password:");
-    
-    if (enteredPassword === correctPassword) {
-        // Password correct - show the content
-        document.body.style.display = 'block';
-        return true;
-    } else if (enteredPassword !== null) {
-        // Password wrong (but user didn't cancel)
-        alert("Incorrect password. Please try again.");
-        checkPassword(); // Ask again instead of redirecting
-    } else {
-        // User cancelled - hide content
+        const correctPassword = "flames";
+        function checkPassword() {
+            const enteredPassword = prompt("This dashboard is protected. Please enter the password:");
+            if (enteredPassword === correctPassword) {
+                document.body.style.display = 'block';
+                return true;
+            } else if (enteredPassword !== null) {
+                alert("Incorrect password. Please try again.");
+                checkPassword();
+            } else {
+                document.body.style.display = 'none';
+            }
+        }
         document.body.style.display = 'none';
-    }
-}
-// Hide content initially and check password when page loads
-document.body.style.display = 'none';
-document.addEventListener('DOMContentLoaded', function() {
-    checkPassword();
-});
-</script>
-
+        document.addEventListener('DOMContentLoaded', function() { checkPassword(); });
+    </script>
 </head>
 
 <body>
@@ -48,6 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <!-- Filter Controls -->
         <section class="filters-section">
             <div class="filters-grid">
+
                 <!-- Revenue Filter -->
                 <div class="card filter-card">
                     <h3>Revenue Range</h3>
@@ -88,23 +84,22 @@ document.addEventListener('DOMContentLoaded', function() {
                     <h3>Location (City)</h3>
                     <div class="form-group">
                         <select id="locationFilter" class="form-control" multiple size="6">
-                            <!-- Options populated by JavaScript -->
+                            <!-- Options will be populated by JS -->
                         </select>
                     </div>
                 </div>
-<!-- Add this inside .filters-grid wherever filters are, before Actions card -->
-    <div class="card filter-card">
-  <h3>Prospect Score Range</h3>
-  <div id="prospectScoreSlider" style="margin: 24px 0;"></div>
-  <div style="display:flex; justify-content:space-between; font-size:1em; margin-top: 8px;">
-    <span>Min: <span id="scoreMinValue">0</span></span>
-    <span>Max: <span id="scoreMaxValue">100</span></span>
-  </div>
-</div>
 
-</div>
+                <!-- Prospect Score Double-Handle Slider Filter -->
+                <div class="card filter-card">
+                    <h3>Prospect Score Range</h3>
+                    <div id="prospectScoreSlider" style="margin:24px 0;"></div>
+                    <div style="display:flex; justify-content:space-between; font-size:1em; margin-top:8px;">
+                        <span>Min: <span id="scoreMinValue">0</span></span>
+                        <span>Max: <span id="scoreMaxValue">100</span></span>
+                    </div>
+                </div>
 
-                <!-- Action Buttons -->
+                <!-- Actions -->
                 <div class="card filter-card">
                     <h3>Actions</h3>
                     <div class="action-buttons">
@@ -132,26 +127,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="card__body">
                     <div class="table-container">
                         <table id="resultsTable" class="results-table">
-                           <thead>
-  <tr>
-    <th data-sort="Company Name">Company Name <span class="sort-indicator"></span></th>
-    <th data-sort="Who it is assigned to">Assigned To <span class="sort-indicator"></span></th>
-    <th data-sort="Account Type">Account Type <span class="sort-indicator"></span></th>
-    <th data-sort="Prospect Score">Prospect Score <span class="sort-indicator"></span></th>
-    <th data-sort="Account Notes">Account Notes <span class="sort-indicator"></span></th>
-    <th data-sort="Drop Notes">Drop Notes <span class="sort-indicator"></span></th>
-    <th data-sort="Website">Website <span class="sort-indicator"></span></th>
-    <th data-sort="LinkedinURL">LinkedIn <span class="sort-indicator"></span></th>
-    <th data-sort="Revenue Estimate">Revenue <span class="sort-indicator"></span></th>
-    <th data-sort="# of Employees">Employees <span class="sort-indicator"></span></th>
-    <th data-sort="Head Office">Head Office <span class="sort-indicator"></span></th>
-    <th data-sort="Country">Country <span class="sort-indicator"></span></th>
-    <th data-sort="Segmentation">Segmentation <span class="sort-indicator"></span></th>
-  </tr>
-</thead>
-
+                            <thead>
+                                <tr>
+                                    <th data-sort="Company Name">Company Name <span class="sort-indicator"></span></th>
+                                    <th data-sort="Who it is assigned to">Assigned To <span class="sort-indicator"></span></th>
+                                    <th data-sort="Account Type">Account Type <span class="sort-indicator"></span></th>
+                                    <th data-sort="Prospect Score">Prospect Score <span class="sort-indicator"></span></th>
+                                    <th data-sort="Account Notes">Account Notes <span class="sort-indicator"></span></th>
+                                    <th data-sort="Drop Notes">Drop Notes <span class="sort-indicator"></span></th>
+                                    <th data-sort="Website">Website <span class="sort-indicator"></span></th>
+                                    <th data-sort="LinkedinURL">LinkedIn <span class="sort-indicator"></span></th>
+                                    <th data-sort="Revenue Estimate">Revenue <span class="sort-indicator"></span></th>
+                                    <th data-sort="# of Employees">Employees <span class="sort-indicator"></span></th>
+                                    <th data-sort="Head Office">Head Office <span class="sort-indicator"></span></th>
+                                    <th data-sort="Country">Country <span class="sort-indicator"></span></th>
+                                    <th data-sort="Segmentation">Segmentation <span class="sort-indicator"></span></th>
+                                </tr>
+                            </thead>
                             <tbody id="resultsBody">
-                                <!-- Results populated by JavaScript -->
+                                <!-- Populated by JS -->
                             </tbody>
                         </table>
                     </div>
@@ -166,6 +160,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     </div>
 
+    <!-- Your main app JS (must come after all DOM content and after loading noUiSlider in head) -->
     <script src="app.js"></script>
 </body>
 </html>
