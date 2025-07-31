@@ -566,7 +566,7 @@ function renderTable() {
             <td><strong>${escapeHtml(item['Company Name'])}</strong></td>
             <td>${escapeHtml(item['Who it is assigned to'] || 'Unassigned')}</td>
             <td><span class="status status--info">${escapeHtml(item['Account Type'] || 'N/A')}</span></td>
-            <td><span style="${getScoreStyle(item['Prospect Score'])}">${item['Prospect Score'] || 'N/A'}</span></td>
+            <td><span style="${(item['Prospect Score'])}">${item['Prospect Score'] || 'N/A'}</span></td>
             <td>${escapeHtml(item['Account Notes'] || '')}</td>
             <td>${escapeHtml(item['Drop Notes'] || '')}</td>
             <td><a href="${website}" target="_blank">${escapeHtml(item.Website)}</a></td>
@@ -663,22 +663,18 @@ function getRevenueClass(revenue) {
 }
 
 function getScoreStyle(score) {
+    // Normalize between 0 and 100
     let normalized = Math.max(0, Math.min(100, score)) / 100;
-    let r, g, b;
+    // Hue: 0 = red, 60 = yellow, 120 = green
+    let hue = 0 + 120 * normalized; // 0 (red) to 120 (green)
+    let saturation = 55; // Softened (was 100)
+    let lightness = 74; // Softer, pastel tone
 
-    if (normalized < 0.5) {
-        r = 255;
-        g = Math.round(510 * normalized);
-        b = 0;
-    } else {
-        r = Math.round(510 * (1 - normalized));
-        g = 255;
-        b = 0;
-    }
+    // Set readable text color
+    let textColor = (normalized > 0.6) ? '#222' : '#333';
 
-    let textColor = (g < 180 && r > 160) ? 'black' : 'white';
-
-    return `background-color: rgb(${r}, ${g}, ${b}); color: ${textColor}; font-weight: 600; padding: 4px 8px; border-radius: 6px; min-width: 30px; display: inline-block; text-align: center;`;
+    // Return style string
+    return `background-color: hsl(${hue},${saturation}%,${lightness}%); color: ${textColor}; font-weight: 600; padding: 4px 8px; border-radius: 6px; min-width: 30px; display: inline-block; text-align: center;`;
 }
 
 function highlightSearchTerms() {
