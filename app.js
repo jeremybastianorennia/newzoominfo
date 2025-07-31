@@ -307,7 +307,7 @@ let filteredData = [...zoomInfoData];
 let currentSortColumn = null;
 let currentSortDirection = 'asc';
 
-let revenueFilter, minEmployeesInput, maxEmployeesInput, locationFilter,
+let revenueFilter, minEmployeesInput, maxEmployeesInput, assignedToFilter,
     searchInput, resultsBody, resultsCount, clearFiltersBtn, exportDataBtn, loadingIndicator;
 
 // ========= INIT ==========
@@ -315,7 +315,7 @@ document.addEventListener('DOMContentLoaded', function () {
     revenueFilter = document.getElementById('revenueFilter');
     minEmployeesInput = document.getElementById('minEmployees');
     maxEmployeesInput = document.getElementById('maxEmployees');
-    locationFilter = document.getElementById('locationFilter');
+    assignedToFilter = document.getElementById('assignedToFilter');
     searchInput = document.getElementById('searchInput');
     resultsBody = document.getElementById('resultsBody');
     resultsCount = document.getElementById('resultsCount');
@@ -323,7 +323,7 @@ document.addEventListener('DOMContentLoaded', function () {
     exportDataBtn = document.getElementById('exportData');
     loadingIndicator = document.getElementById('loadingIndicator');
 
-    populateLocationFilter();
+    populateAssignedToFilter();
     attachEventListeners();
     filteredData = [...zoomInfoData];
     renderTable();
@@ -354,12 +354,11 @@ function applyAllFilters() {
         return empCount >= minEmployees && empCount <= maxEmployees;
     });
 
-    // Location
-    const selectedCities = getSelectedOptions(locationFilter);
-    if (selectedCities.length > 0) {
+    // Assigned To
+    const selectedAssignees = getSelectedOptions(assignedToFilter);
+    if (selectedAssignees.length > 0) {
         data = data.filter(item => {
-            const city = item['Head Office'].split(',')[0].trim();
-            return selectedCities.includes(city);
+            return selectedAssignees.includes(item['Who it is assigned to']);
         });
     }
 
@@ -388,7 +387,7 @@ function getSelectedOptions(selectElement) {
 // ======= SORTING & CLEAR =======
 function clearAllFilters() {
     revenueFilter.selectedIndex = -1;
-    locationFilter.selectedIndex = -1;
+    assignedToFilter.selectedIndex = -1;
     minEmployeesInput.value = '';
     maxEmployeesInput.value = '';
     searchInput.value = '';
@@ -592,7 +591,7 @@ function debounce(func, wait) {
 // ======= EVENT WIRING =======
 function attachEventListeners() {
     revenueFilter.addEventListener('change', handleFilterChange);
-    locationFilter.addEventListener('change', handleFilterChange);
+    assignedToFilter.addEventListener('change', handleFilterChange);
     minEmployeesInput.addEventListener('input', debounce(handleFilterChange, 300));
     maxEmployeesInput.addEventListener('input', debounce(handleFilterChange, 300));
     searchInput.addEventListener('input', debounce(handleFilterChange, 300));
@@ -602,26 +601,25 @@ function attachEventListeners() {
         header.addEventListener('click', () => sortTable(header.dataset.sort));
     });
 }
-function populateLocationFilter() {
-    const uniqueCities = [
+function populateAssignedToFilter() {
+    const uniqueAssignees = [
         ...new Set(
             zoomInfoData
-                .map(item => {
-                    const headOffice = item['Head Office'] || '';
-                    return headOffice.split(',')[0].trim();
-                })
-                .filter(city => city)
+                .map(item => item['Who it is assigned to'])
+                .filter(assignee => assignee)
         )
     ].sort();
-    locationFilter.innerHTML = '';
+    
+    assignedToFilter.innerHTML = '';
     const defaultOption = document.createElement('option');
     defaultOption.value = '';
-    defaultOption.textContent = 'All Locations';
-    locationFilter.appendChild(defaultOption);
-    uniqueCities.forEach(city => {
+    defaultOption.textContent = 'All Assignees';
+    assignedToFilter.appendChild(defaultOption);
+    
+    uniqueAssignees.forEach(assignee => {
         const option = document.createElement('option');
-        option.value = city;
-        option.textContent = city;
-        locationFilter.appendChild(option);
+        option.value = assignee;
+        option.textContent = assignee;
+        assignedToFilter.appendChild(option);
     });
 }
