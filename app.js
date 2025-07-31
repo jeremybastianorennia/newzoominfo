@@ -311,6 +311,14 @@ let prospectScoreMinInput, prospectScoreMaxInput, scoreMinValue, scoreMaxValue;
 let revenueFilter, minEmployeesInput, maxEmployeesInput, locationFilter, 
     searchInput, resultsBody, resultsCount, clearFiltersBtn, exportDataBtn, loadingIndicator;
 
+function handleFilterChange() {
+    showLoading();
+    setTimeout(() => {
+        applyAllFilters();
+        hideLoading();
+    }, 50);
+}
+
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function () {
     console.log('App starting, data length:', zoomInfoData.length);
@@ -410,13 +418,6 @@ prospectScoreMaxInput.addEventListener('input', handleProspectScoreRange);
     });
 }
 
-function handleFilterChange() {
-    showLoading();
-    setTimeout(() => {
-        applyAllFilters();
-        hideLoading();
-    }, 50);
-}
 function handleProspectScoreRange() {
     let min = parseInt(prospectScoreMinInput.value, 10);
     let max = parseInt(prospectScoreMaxInput.value, 10);
