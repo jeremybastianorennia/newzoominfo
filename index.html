@@ -2,10 +2,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Add to <head> before your own CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.6.1/nouislider.min.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.6.1/nouislider.min.js"></script>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TAM Dashboard</title>
@@ -50,72 +46,71 @@ document.addEventListener('DOMContentLoaded', function() {
 
         <!-- Filter Controls -->
         <section class="filters-section">
-        <div class="filters-grid">
+            <div class="filters-grid">
+                <!-- Revenue Filter -->
+                <div class="card filter-card">
+                    <h3>Revenue Range</h3>
+                    <div class="form-group">
+                        <select id="revenueFilter" class="form-control" multiple size="6">
+                            <option value="Under $500,000">Under $500,000</option>
+                            <option value="$500,000 - $1 mil.">$500,000 - $1 mil.</option>
+                            <option value="$1 mil. - $5 mil.">$1 mil. - $5 mil.</option>
+                            <option value="$5 mil. - $10 mil.">$5 mil. - $10 mil.</option>
+                            <option value="$10 mil. - $25 mil.">$10 mil. - $25 mil.</option>
+                            <option value="$25 mil. - $50 mil.">$25 mil. - $50 mil.</option>
+                            <option value="$50 mil. - $100 mil.">$50 mil. - $100 mil.</option>
+                            <option value="$100 mil. - $250 mil.">$100 mil. - $250 mil.</option>
+                            <option value="$250 mil. - $500 mil.">$250 mil. - $500 mil.</option>
+                            <option value="$500 mil. - $1 bil.">$500 mil. - $1 bil.</option>
+                            <option value="Over $5 bil.">Over $5 bil.</option>
+                        </select>
+                    </div>
+                </div>
 
-  <!-- Revenue Filter -->
-  <div class="card filter-card">
-    <h3>Revenue Range</h3>
-    <div class="form-group">
-      <select id="revenueFilter" class="form-control" multiple size="6">
-        <option value="Under $500,000">Under $500,000</option>
-        <option value="$500,000 - $1 mil.">$500,000 - $1 mil.</option>
-        <option value="$1 mil. - $5 mil.">$1 mil. - $5 mil.</option>
-        <option value="$5 mil. - $10 mil.">$5 mil. - $10 mil.</option>
-        <option value="$10 mil. - $25 mil.">$10 mil. - $25 mil.</option>
-        <option value="$25 mil. - $50 mil.">$25 mil. - $50 mil.</option>
-        <option value="$50 mil. - $100 mil.">$50 mil. - $100 mil.</option>
-        <option value="$100 mil. - $250 mil.">$100 mil. - $250 mil.</option>
-        <option value="$250 mil. - $500 mil.">$250 mil. - $500 mil.</option>
-        <option value="$500 mil. - $1 bil.">$500 mil. - $1 bil.</option>
-        <option value="Over $5 bil.">Over $5 bil.</option>
-      </select>
-    </div>
+                <!-- Employee Count Filter -->
+                <div class="card filter-card">
+                    <h3>Employee Count</h3>
+                    <div class="employee-inputs">
+                        <div class="form-group">
+                            <label class="form-label" for="minEmployees">Min Employees</label>
+                            <input type="number" id="minEmployees" class="form-control" placeholder="0" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="maxEmployees">Max Employees</label>
+                            <input type="number" id="maxEmployees" class="form-control" placeholder="Unlimited" min="0">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location Filter -->
+                <div class="card filter-card">
+                    <h3>Location (City)</h3>
+                    <div class="form-group">
+                        <select id="locationFilter" class="form-control" multiple size="6">
+                            <!-- Options populated by JavaScript -->
+                        </select>
+                    </div>
+                </div>
+<!-- Add this inside .filters-grid wherever filters are, before Actions card -->
+<div class="card filter-card">
+  <h3>Prospect Score Range</h3>
+  <div class="form-group" style="padding:8px 0;">
+    <input 
+      type="range" 
+      id="prospectScoreMin" 
+      min="0" max="100" step="1" 
+      value="0" 
+      style="width: 38%; display:inline;">
+    <span id="scoreMinValue" style="margin: 0 8px;">0</span>
+    <span style="font-weight: bold;">–</span>
+    <span id="scoreMaxValue" style="margin: 0 8px;">100</span>
+    <input 
+      type="range" 
+      id="prospectScoreMax" 
+      min="0" max="100" step="1" 
+      value="100" 
+      style="width: 38%; display:inline;">
   </div>
-
-  <!-- Employee Count Filter -->
-  <div class="card filter-card">
-    <h3>Employee Count</h3>
-    <div class="employee-inputs">
-      <div class="form-group">
-        <label class="form-label" for="minEmployees">Min Employees</label>
-        <input type="number" id="minEmployees" class="form-control" placeholder="0" min="0">
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="maxEmployees">Max Employees</label>
-        <input type="number" id="maxEmployees" class="form-control" placeholder="Unlimited" min="0">
-      </div>
-    </div>
-  </div>
-
-  <!-- Location Filter -->
-  <div class="card filter-card">
-    <h3>Location (City)</h3>
-    <div class="form-group">
-      <select id="locationFilter" class="form-control" multiple size="6">
-        <!-- Options populated by JavaScript -->
-      </select>
-    </div>
-  </div>
-
-  <!-- Prospect Score Double-Handle Slider -->
-  <div class="card filter-card">
-    <h3>Prospect Score Range</h3>
-    <div id="prospectScoreSlider" style="margin:24px 0;"></div>
-    <div style="display:flex; justify-content:space-between; font-size:1em; margin-top:8px;">
-      <span>Min: <span id="scoreMinValue">0</span></span>
-      <span>Max: <span id="scoreMaxValue">100</span></span>
-    </div>
-  </div>
-
-  <!-- Actions -->
-  <div class="card filter-card">
-    <h3>Actions</h3>
-    <div class="action-buttons">
-      <button id="clearFilters" class="btn btn--secondary btn--full-width">Clear Filters</button>
-      <button id="exportData" class="btn btn--primary btn--full-width">Export Data</button>
-    </div>
-  </div>
-
 </div>
 
                 <!-- Action Buttons -->
