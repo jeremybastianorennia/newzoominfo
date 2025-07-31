@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TAM Dashboard</title>
     <link rel="stylesheet" href="style.css">
+    <!-- PapaParse CSV library -->
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     <script>
         const correctPassword = "flames";
@@ -70,18 +71,14 @@
                 <div class="card filter-card">
                     <h3>Segmentation</h3>
                     <div class="form-group">
-                        <select id="segmentationFilter" class="form-control" multiple size="6">
-                            <!-- Options will be populated by JS -->
-                        </select>
+                        <select id="segmentationFilter" class="form-control" multiple size="6"></select>
                     </div>
                 </div>
 
                 <div class="card filter-card">
                     <h3>Assigned To</h3>
                     <div class="form-group">
-                        <select id="assignedToFilter" class="form-control" multiple size="6">
-                            <!-- Options will be populated by JS -->
-                        </select>
+                        <select id="assignedToFilter" class="form-control" multiple size="6"></select>
                     </div>
                 </div>
 
@@ -100,9 +97,7 @@
                 <div class="card__header">
                     <div class="results-header">
                         <h2>Account Results</h2>
-                        <div class="results-count">
-                            <span id="resultsCount">0 accounts found</span>
-                        </div>
+                        <div class="results-count"><span id="resultsCount">0 accounts found</span></div>
                     </div>
                     <div class="search-container">
                         <input type="text" id="searchInput" class="form-control" placeholder="Search within results...">
