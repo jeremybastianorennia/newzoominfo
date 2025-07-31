@@ -333,13 +333,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Populate location filter
 function populateLocationFilter() {
-    const uniqueCities = [...new Set(zoomInfoData.map(item => {
-        const headOffice = item['Head Office'] || '';
-        return headOffice.split(',')[0].trim();
-    }))].filter(city => city).sort();
+    const uniqueCities = [
+        ...new Set(
+            zoomInfoData
+                .map(item => {
+                    const headOffice = item['Head Office'] || '';
+                    return headOffice.split(',')[0].trim();
+                })
+                .filter(city => city) // Remove empty or undefined
+        )
+    ].sort(); // Sort alphabetically
 
+    // Clear existing options
     locationFilter.innerHTML = '';
 
+    // Add default "All" option if desired
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'All Locations';
+    locationFilter.appendChild(defaultOption);
+
+    // Add each unique city to the dropdown
     uniqueCities.forEach(city => {
         const option = document.createElement('option');
         option.value = city;
@@ -347,6 +361,7 @@ function populateLocationFilter() {
         locationFilter.appendChild(option);
     });
 }
+
 
 // Attach event listeners
 function attachEventListeners() {
