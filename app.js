@@ -49,6 +49,7 @@ function handleFilterChange() {
         hideLoading();
     }, 50);
 }
+
 function applyAllFilters() {
     let data = [...zoomInfoData];
     const selectedRevenues = getSelectedOptions(revenueFilter);
@@ -63,13 +64,11 @@ function applyAllFilters() {
         return empCount >= minEmployees && empCount <= maxEmployees;
     });
 
-    // New Segmentation filter
     const selectedSegments = getSelectedOptions(segmentationFilter);
     if (selectedSegments.length > 0) {
         data = data.filter(item => selectedSegments.includes(item['Segmentation']));
     }
 
-    // New Assigned To filter
     const selectedAssignedTos = getSelectedOptions(assignedToFilter);
     if (selectedAssignedTos.length > 0) {
         data = data.filter(item => selectedAssignedTos.includes(item['Assigned To']));
@@ -291,6 +290,7 @@ function attachEventListeners() {
         header.addEventListener('click', () => sortTable(header.dataset.sort));
     });
 }
+
 function populateSegmentationFilter() {
     const uniqueSegments = [
         ...new Set(
