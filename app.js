@@ -503,7 +503,6 @@ function updateSortIndicators() {
     }
 }
 
-// Render the data table - FIXED VERSION
 function renderTable() {
     console.log('renderTable called, filteredData length:', filteredData.length);
     
@@ -526,6 +525,33 @@ function renderTable() {
         updateResultsCount(0);
         return;
     }
+
+    filteredData.forEach(item => {
+        const row = document.createElement('tr');
+        const website = item.Website.startsWith('http') ? item.Website : `https://${item.Website}`;
+        const linkedinURL = item.LinkedinURL || '#';
+        
+        row.innerHTML = `
+            <td><strong>${escapeHtml(item['Company Name'])}</strong></td>
+            <td>${escapeHtml(item['Who it is assigned to'] || 'Unassigned')}</td>
+            <td><span class="status status--info">${escapeHtml(item['Account Type'] || 'N/A')}</span></td>
+            <td><span style="${getScoreStyle(item['Prospect Score'])}">${item['Prospect Score'] || 'N/A'}</span></td>
+            <td>${escapeHtml(item['Account Notes'] || '')}</td>
+            <td>${escapeHtml(item['Drop Notes'] || '')}</td>
+            <td><a href="${website}" target="_blank">${escapeHtml(item.Website)}</a></td>
+            <td>${item.LinkedinURL ? `<a href="${linkedinURL}" target="_blank">LinkedIn</a>` : 'N/A'}</td>
+            <td><span class="${getRevenueClass(item['Revenue Estimate'])}">${escapeHtml(item['Revenue Estimate'])}</span></td>
+            <td>${item['# of Employees'].toLocaleString()}</td>
+            <td>${escapeHtml(item['Head Office'])}</td>
+            <td>${escapeHtml(item.Country)}</td>
+            <td><span class="status status--success">${escapeHtml(item.Segmentation || 'N/A')}</span></td>
+        `;
+        resultsBody.appendChild(row);
+    });
+
+    updateResultsCount(filteredData.length);
+    highlightSearchTerms();
+}
 
     filteredData.forEach(item => {
         const row = document.createElement('tr');
@@ -629,6 +655,31 @@ function getRevenueClass(revenue) {
     }
     return 'revenue-low';
 }
+// Dynamic color gradient for prospect score: red → yellow → green
+function getScoreStyle(score) {
+    // Ensure the score is between 0 and 100
+    let normalized = Math.max(0, Math.min(100, score)) / 100;
+    let r, g, b;
+    
+    if (normalized < 0.5) {
+        // Red to Yellow (0-50 range)
+        r = 255;
+        g = Math.round(510 * normalized); // 0 to 255 as score goes 0-50
+        b = 0;
+    } else {
+        // Yellow to Green (50-100 range)
+        r = Math.round(510 * (1 - normalized)); // 255 to 0 as score goes 50-100
+        g = 255;
+        b = 0;
+    }
+    
+    // Choose text color for readability
+    let textColor = (g < 180 && r > 160) ? 'black' : 'white';
+    
+    // Return inline style string
+    return `background-color: rgb(${r}, ${g}, ${b}); color: ${textColor}; font-weight: 600; padding: 4px 8px; border-radius: 6px; min-width: 30px; display: inline-block; text-align: center;`;
+}
+
 
 // Get CSS class for prospect score styling
 function getScoreClass(score) {
