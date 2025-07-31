@@ -8,18 +8,34 @@
     <link rel="stylesheet" href="style.css">
 
     <script>
-  // Change this to your desired password
-  const correctPassword = "flames";
+const correctPassword = "flames";
 
-  const enteredPassword = prompt("This dashboard is protected. Please enter the password:");
+function checkPassword() {
+    const enteredPassword = prompt("This dashboard is protected. Please enter the password:");
+    
+    if (enteredPassword === correctPassword) {
+        // Password correct - show the content
+        document.body.style.display = 'block';
+        return true;
+    } else if (enteredPassword !== null) {
+        // Password wrong (but user didn't cancel)
+        alert("Incorrect password. Please try again.");
+        checkPassword(); // Ask again instead of redirecting
+    } else {
+        // User cancelled - hide content
+        document.body.style.display = 'none';
+    }
+}
 
-  if (enteredPassword !== correctPassword) {
-    alert("Incorrect password. You will be redirected.");
-    window.location.href = "https://www.google.com"; // redirect if password is wrong
-  }
+// Hide content initially and check password when page loads
+document.body.style.display = 'none';
+document.addEventListener('DOMContentLoaded', function() {
+    checkPassword();
+});
 </script>
 
 </head>
+
 <body>
     <div class="container">
         <!-- Header -->
