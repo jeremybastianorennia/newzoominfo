@@ -301,16 +301,21 @@ const zoomInfoData = [
     "Segmentation": "SMB"
   }
 ];
+// ====== DATA ========
+const zoomInfoData = [
+  // ... (use your current data array here, as you posted; trimmed for brevity)
+];
+
+// ====== GLOBALS ======
 let filteredData = [...zoomInfoData];
 let currentSortColumn = null;
 let currentSortDirection = 'asc';
-let prospectScoreMinInput, prospectScoreMaxInput, scoreMinValue, scoreMaxValue;
 
-
-// DOM elements
-let revenueFilter, minEmployeesInput, maxEmployeesInput, locationFilter, 
+let revenueFilter, minEmployeesInput, maxEmployeesInput, locationFilter,
     searchInput, resultsBody, resultsCount, clearFiltersBtn, exportDataBtn, loadingIndicator;
+let prospectScoreSlider, scoreMinValue, scoreMaxValue;
 
+// ====== FILTER FUNCTIONS ======
 function handleFilterChange() {
     showLoading();
     setTimeout(() => {
@@ -319,141 +324,24 @@ function handleFilterChange() {
     }, 50);
 }
 
-// Initialize the application
-document.addEventListener('DOMContentLoaded', function () {
-    console.log('App starting, data length:', zoomInfoData.length);
-
-    revenueFilter = document.getElementById('revenueFilter');
-    minEmployeesInput = document.getElementById('minEmployees');
-    maxEmployeesInput = document.getElementById('maxEmployees');
-    locationFilter = document.getElementById('locationFilter');
-    searchInput = document.getElementById('searchInput');
-    resultsBody = document.getElementById('resultsBody');
-    resultsCount = document.getElementById('resultsCount');
-    clearFiltersBtn = document.getElementById('clearFilters');
-    exportDataBtn = document.getElementById('exportData');
-    loadingIndicator = document.getElementById('loadingIndicator');
-scoreMinValue = document.getElementById('scoreMinValue');
-scoreMaxValue = document.getElementById('scoreMaxValue');
-  prospectScoreSlider = document.getElementById('prospectScoreSlider');
-    populateLocationFilter();
-    attachEventListeners();
-
-
-    filteredData = [...zoomInfoData];
-    renderTable();
-  if (prospectScoreSlider && typeof noUiSlider !== 'undefined') {
-    noUiSlider.create(prospectScoreSlider, {
-        start: [0, 100],
-        connect: true,
-        step: 1,
-        range: { min: 0, max: 100 },
-        tooltips: true,
-        format: {
-            to: value => Math.round(value),
-            from: value => Number(value)
-        }
-    });
-
-    prospectScoreSlider.noUiSlider.on('update', function(values) {
-        let min = Math.round(values[0]);
-        let max = Math.round(values[1]);
-        scoreMinValue.textContent = min;
-        scoreMaxValue.textContent = max;
-        handleFilterChange();
-    });
-} else {
-    console.error('prospectScoreSlider or noUiSlider not defined!');
-}
-
-});
-
-// Populate location filter
-function populateLocationFilter() {
-    const uniqueCities = [
-        ...new Set(
-            zoomInfoData
-                .map(item => {
-                    const headOffice = item['Head Office'] || '';
-                    return headOffice.split(',')[0].trim();
-                })
-                .filter(city => city) // Remove empty or undefined
-        )
-    ].sort(); // Sort alphabetically
-
-    // Clear existing options
-    locationFilter.innerHTML = '';
-
-    // Add default "All" option if desired
-    const defaultOption = document.createElement('option');
-    defaultOption.value = '';
-    defaultOption.textContent = 'All Locations';
-    locationFilter.appendChild(defaultOption);
-
-    // Add each unique city to the dropdown
-    uniqueCities.forEach(city => {
-        const option = document.createElement('option');
-        option.value = city;
-        option.textContent = city;
-        locationFilter.appendChild(option);
-    });
-}
-
-
-// Attach event listeners
-function attachEventListeners() {
-    revenueFilter.addEventListener('change', handleFilterChange);
-    locationFilter.addEventListener('change', handleFilterChange);
-    minEmployeesInput.addEventListener('input', debounce(handleFilterChange, 300));
-    maxEmployeesInput.addEventListener('input', debounce(handleFilterChange, 300));
-    searchInput.addEventListener('input', debounce(handleFilterChange, 300));
-    clearFiltersBtn.addEventListener('click', clearAllFilters);
-    exportDataBtn.addEventListener('click', exportToCSV);
-  prospectScoreMinInput.addEventListener('input', handleProspectScoreRange);
-prospectScoreMaxInput.addEventListener('input', handleProspectScoreRange);
-
-
-    document.querySelectorAll('[data-sort]').forEach(header => {
-        header.addEventListener('click', () => sortTable(header.dataset.sort));
-    });
-}
-
-function handleProspectScoreRange() {
-    let min = parseInt(prospectScoreMinInput.value, 10);
-    let max = parseInt(prospectScoreMaxInput.value, 10);
-
-    if (min > max) {
-        if (event.target === prospectScoreMinInput) {
-            prospectScoreMinInput.value = max;
-            min = max;
-        } else {
-            prospectScoreMaxInput.value = min;
-            max = min;
-        }
-    }
-
-    scoreMinValue.textContent = min;
-    scoreMaxValue.textContent = max;
-
-    handleFilterChange();
-}
-
 function applyAllFilters() {
     let data = [...zoomInfoData];
 
+    // Revenue filter
     const selectedRevenues = getSelectedOptions(revenueFilter);
     if (selectedRevenues.length > 0) {
         data = data.filter(item => selectedRevenues.includes(item['Revenue Estimate']));
     }
 
+    // Employee count filter
     const minEmployees = parseInt(minEmployeesInput.value) || 0;
     const maxEmployees = parseInt(maxEmployeesInput.value) || Number.MAX_SAFE_INTEGER;
-
     data = data.filter(item => {
         const empCount = item['# of Employees'];
         return empCount >= minEmployees && empCount <= maxEmployees;
     });
 
+    // Location filter
     const selectedCities = getSelectedOptions(locationFilter);
     if (selectedCities.length > 0) {
         data = data.filter(item => {
@@ -462,6 +350,17 @@ function applyAllFilters() {
         });
     }
 
+    // Prospect Score Range — get from noUiSlider
+    let scoreMin = 0, scoreMax = 100;
+    if (prospectScoreSlider && prospectScoreSlider.noUiSlider) {
+        [scoreMin, scoreMax] = prospectScoreSlider.noUiSlider.get().map(Number);
+    }
+    data = data.filter(item => {
+        const ps = Number(item["Prospect Score"]);
+        return ps >= scoreMin && ps <= scoreMax;
+    });
+
+    // Search filter
     const searchTerm = searchInput.value.trim().toLowerCase();
     if (searchTerm) {
         data = data.filter(item => {
@@ -470,12 +369,6 @@ function applyAllFilters() {
             );
         });
     }
-const scoreMin = parseInt(prospectScoreMinInput.value, 10) || 0;
-const scoreMax = parseInt(prospectScoreMaxInput.value, 10) || 100;
-data = data.filter(item => {
-    const ps = Number(item["Prospect Score"]);
-    return ps >= scoreMin && ps <= scoreMax;
-});
 
     filteredData = data;
 
@@ -490,17 +383,21 @@ function getSelectedOptions(selectElement) {
     return Array.from(selectElement.selectedOptions).map(option => option.value);
 }
 
+// ====== SORTING AND CLEARING ======
 function clearAllFilters() {
     revenueFilter.selectedIndex = -1;
     locationFilter.selectedIndex = -1;
     minEmployeesInput.value = '';
     maxEmployeesInput.value = '';
     searchInput.value = '';
-
+    if (prospectScoreSlider && prospectScoreSlider.noUiSlider) {
+        prospectScoreSlider.noUiSlider.set([0, 100]);
+        scoreMinValue.textContent = 0;
+        scoreMaxValue.textContent = 100;
+    }
     currentSortColumn = null;
     currentSortDirection = 'asc';
     updateSortIndicators();
-
     filteredData = [...zoomInfoData];
     renderTable();
 }
@@ -512,7 +409,6 @@ function sortTable(column) {
         currentSortColumn = column;
         currentSortDirection = 'asc';
     }
-
     applySorting();
     renderTable();
     updateSortIndicators();
@@ -521,7 +417,6 @@ function sortTable(column) {
 function applySorting() {
     filteredData.sort((a, b) => {
         let aVal, bVal;
-
         if (currentSortColumn === '# of Employees') {
             aVal = Number(a['# of Employees']);
             bVal = Number(b['# of Employees']);
@@ -548,7 +443,6 @@ function updateSortIndicators() {
     document.querySelectorAll('.sort-indicator').forEach(indicator => {
         indicator.className = 'sort-indicator';
     });
-
     if (currentSortColumn) {
         const indicator = document.querySelector(`[data-sort="${currentSortColumn}"] .sort-indicator`);
         if (indicator) {
@@ -557,25 +451,18 @@ function updateSortIndicators() {
     }
 }
 
+// ====== TABLE RENDERING ======
 function renderTable() {
-    console.log('renderTable called, filteredData length:', filteredData.length);
-
-    if (!resultsBody) {
-        console.log('resultsBody not found!');
-        return;
-    }
-
+    if (!resultsBody) return;
     resultsBody.innerHTML = '';
 
     if (filteredData.length === 0) {
-        resultsBody.innerHTML = `
-            <tr>
-                <td colspan="13" class="no-results">
-                    <h3>No accounts found</h3>
-                    <p>Try adjusting your filters to see more results.</p>
-                </td>
-            </tr>
-        `;
+        resultsBody.innerHTML = `<tr>
+            <td colspan="13" class="no-results">
+                <h3>No accounts found</h3>
+                <p>Try adjusting your filters to see more results.</p>
+            </td>
+        </tr>`;
         updateResultsCount(0);
         return;
     }
@@ -589,7 +476,7 @@ function renderTable() {
             <td><strong>${escapeHtml(item['Company Name'])}</strong></td>
             <td>${escapeHtml(item['Who it is assigned to'] || 'Unassigned')}</td>
             <td><span class="status status--info">${escapeHtml(item['Account Type'] || 'N/A')}</span></td>
-            <td><span style="${(item['Prospect Score'])}">${item['Prospect Score'] || 'N/A'}</span></td>
+            <td><span style="${getScoreStyle(item['Prospect Score'])}">${item['Prospect Score'] || 'N/A'}</span></td>
             <td>${escapeHtml(item['Account Notes'] || '')}</td>
             <td>${escapeHtml(item['Drop Notes'] || '')}</td>
             <td><a href="${website}" target="_blank">${escapeHtml(item.Website)}</a></td>
@@ -607,18 +494,36 @@ function renderTable() {
     highlightSearchTerms();
 }
 
+function getScoreStyle(score) {
+    // Pastel, high-contrast and readable!
+    let normalized = Math.max(0, Math.min(100, score)) / 100;
+    let hue = 0 + 120 * normalized;
+    let saturation = 38;
+    let lightness = 91;
+    let textColor = '#1a1a1a';
+    return `background-color: hsl(${hue},${saturation}%,${lightness}%); color: ${textColor}; font-weight: bold; font-size: 1.05em; padding: 6px 10px; border-radius: 6px; min-width: 38px; display: inline-block; text-align: center; letter-spacing: 0.5px;`;
+}
+
+function getRevenueClass(revenue) {
+    if (revenue.includes('bil.') || revenue.includes('$500 mil. - $1 bil.') || revenue.includes('$250 mil. - $500 mil.') || revenue.includes('$100 mil. - $250 mil.')) {
+        return 'revenue-high';
+    } else if (revenue.includes('$50 mil.') || revenue.includes('$25 mil.')) {
+        return 'revenue-medium';
+    }
+    return 'revenue-low';
+}
+
+// ====== CSV EXPORT, COUNTERS, ETC. ======
 function exportToCSV() {
     if (filteredData.length === 0) {
         alert('No data to export. Please adjust your filters.');
         return;
     }
-
     const headers = [
         'Company Name', 'Assigned To', 'Account Type', 'Prospect Score', 'Account Notes',
         'Drop Notes', 'Website', 'LinkedIn URL', 'Revenue Estimate', 'Employees',
         'Head Office', 'Country', 'Segmentation'
     ];
-
     const csvRows = [
         headers.join(','),
         ...filteredData.map(item => headers.map(header => {
@@ -626,7 +531,6 @@ function exportToCSV() {
             return `"${field.replace(/"/g, '""')}"`;
         }).join(','))
     ];
-
     const csvContent = csvRows.join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
@@ -663,47 +567,9 @@ function updateResultsCount(count) {
     }
 }
 
-function showLoading() {
-    if (loadingIndicator) {
-        loadingIndicator.classList.remove('hidden');
-    }
-}
-
-function hideLoading() {
-    if (loadingIndicator) {
-        loadingIndicator.classList.add('hidden');
-    }
-}
-
-function getRevenueClass(revenue) {
-    if (revenue.includes('bil.') || revenue.includes('$500 mil. - $1 bil.') ||
-        revenue.includes('$250 mil. - $500 mil.') || revenue.includes('$100 mil. - $250 mil.')) {
-        return 'revenue-high';
-    } else if (revenue.includes('$50 mil.') || revenue.includes('$25 mil.')) {
-        return 'revenue-medium';
-    }
-    return 'revenue-low';
-}
-
-function getScoreStyle(score) {
-    // Normalize between 0 and 100
-    let normalized = Math.max(0, Math.min(100, score)) / 100;
-    // Red (0) to Yellow (60) to Green (120)
-    let hue = 0 + 120 * normalized;
-    let saturation = 38;  // much lower, softer pastel
-    let lightness = 91;   // very light background
-
-    // Always use strong contrast for text
-    let textColor = '#1a1a1a';
-
-    return `background-color: hsl(${hue},${saturation}%,${lightness}%); color: ${textColor}; font-weight: bold; font-size: 1.05em; padding: 6px 10px; border-radius: 6px; min-width: 38px; display: inline-block; text-align: center; letter-spacing: 0.5px;`;
-}
-
-
 function highlightSearchTerms() {
     const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
     if (!searchTerm) return;
-
     const regex = new RegExp(escapeRegex(searchTerm), 'gi');
     resultsBody.querySelectorAll('td').forEach(cell => {
         if (cell.querySelector('a')) return; // Don't break links
@@ -716,18 +582,6 @@ function highlightSearchTerms() {
     });
 }
 
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
 function escapeHtml(text) {
     const map = {
         '&': '&amp;',
@@ -738,7 +592,121 @@ function escapeHtml(text) {
     };
     return String(text).replace(/[&<>"']/g, m => map[m]);
 }
-
 function escapeRegex(string) {
     return String(string).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// ====== GENERAL UI ======
+function showLoading() {
+    if (loadingIndicator) {
+        loadingIndicator.classList.remove('hidden');
+    }
+}
+function hideLoading() {
+    if (loadingIndicator) {
+        loadingIndicator.classList.add('hidden');
+    }
+}
+
+// ====== INIT HOOKS AND WIRING ======
+document.addEventListener('DOMContentLoaded', function () {
+    // Assign DOM
+    revenueFilter = document.getElementById('revenueFilter');
+    minEmployeesInput = document.getElementById('minEmployees');
+    maxEmployeesInput = document.getElementById('maxEmployees');
+    locationFilter = document.getElementById('locationFilter');
+    searchInput = document.getElementById('searchInput');
+    resultsBody = document.getElementById('resultsBody');
+    resultsCount = document.getElementById('resultsCount');
+    clearFiltersBtn = document.getElementById('clearFilters');
+    exportDataBtn = document.getElementById('exportData');
+    loadingIndicator = document.getElementById('loadingIndicator');
+    scoreMinValue = document.getElementById('scoreMinValue');
+    scoreMaxValue = document.getElementById('scoreMaxValue');
+    prospectScoreSlider = document.getElementById('prospectScoreSlider');
+
+    populateLocationFilter();
+    attachEventListeners();
+
+    // ====== SLIDER INIT ======
+    if (prospectScoreSlider && typeof noUiSlider !== 'undefined') {
+        noUiSlider.create(prospectScoreSlider, {
+            start: [0, 100],
+            connect: true,
+            step: 1,
+            range: { min: 0, max: 100 },
+            tooltips: true,
+            format: {
+                to: value => Math.round(value),
+                from: value => Number(value)
+            }
+        });
+        prospectScoreSlider.noUiSlider.on('update', function(values) {
+            let min = Math.round(values[0]);
+            let max = Math.round(values[1]);
+            scoreMinValue.textContent = min;
+            scoreMaxValue.textContent = max;
+            handleFilterChange();
+        });
+    } else {
+        console.error('prospectScoreSlider or noUiSlider not defined!');
+    }
+
+    filteredData = [...zoomInfoData];
+    renderTable();
+});
+
+// ====== EVENT WIRING ======
+function attachEventListeners() {
+    revenueFilter.addEventListener('change', handleFilterChange);
+    locationFilter.addEventListener('change', handleFilterChange);
+    minEmployeesInput.addEventListener('input', debounce(handleFilterChange, 300));
+    maxEmployeesInput.addEventListener('input', debounce(handleFilterChange, 300));
+    searchInput.addEventListener('input', debounce(handleFilterChange, 300));
+    clearFiltersBtn.addEventListener('click', clearAllFilters);
+    exportDataBtn.addEventListener('click', exportToCSV);
+    document.querySelectorAll('[data-sort]').forEach(header => {
+        header.addEventListener('click', () => sortTable(header.dataset.sort));
+    });
+}
+
+// ====== LOCATION POPULATION ======
+function populateLocationFilter() {
+    const uniqueCities = [
+        ...new Set(
+            zoomInfoData
+                .map(item => {
+                    const headOffice = item['Head Office'] || '';
+                    return headOffice.split(',')[0].trim();
+                })
+                .filter(city => city)
+        )
+    ].sort();
+
+    locationFilter.innerHTML = '';
+
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'All Locations';
+    locationFilter.appendChild(defaultOption);
+
+    uniqueCities.forEach(city => {
+        const option = document.createElement('option');
+        option.value = city;
+        option.textContent = city;
+        locationFilter.appendChild(option);
+    });
+}
+
+// ====== DEBOUNCE UTILITY ======
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
 }
