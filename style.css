@@ -98,10 +98,16 @@ select[multiple] {
 }
 
 .employee-inputs {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: nowrap;
 }
+
+.employee-inputs input {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
 
 .actions {
     display: flex;
