@@ -325,17 +325,39 @@ document.addEventListener('DOMContentLoaded', function () {
     clearFiltersBtn = document.getElementById('clearFilters');
     exportDataBtn = document.getElementById('exportData');
     loadingIndicator = document.getElementById('loadingIndicator');
-  prospectScoreMinInput = document.getElementById('prospectScoreMin');
-prospectScoreMaxInput = document.getElementById('prospectScoreMax');
 scoreMinValue = document.getElementById('scoreMinValue');
 scoreMaxValue = document.getElementById('scoreMaxValue');
-
-
+  prospectScoreSlider = document.getElementById('prospectScoreSlider');
     populateLocationFilter();
     attachEventListeners();
 
+
     filteredData = [...zoomInfoData];
     renderTable();
+  if (prospectScoreSlider && typeof noUiSlider !== 'undefined') {
+    noUiSlider.create(prospectScoreSlider, {
+        start: [0, 100],
+        connect: true,
+        step: 1,
+        range: { min: 0, max: 100 },
+        tooltips: true,
+        format: {
+            to: value => Math.round(value),
+            from: value => Number(value)
+        }
+    });
+
+    prospectScoreSlider.noUiSlider.on('update', function(values) {
+        let min = Math.round(values[0]);
+        let max = Math.round(values[1]);
+        scoreMinValue.textContent = min;
+        scoreMaxValue.textContent = max;
+        handleFilterChange();
+    });
+} else {
+    console.error('prospectScoreSlider or noUiSlider not defined!');
+}
+
 });
 
 // Populate location filter
