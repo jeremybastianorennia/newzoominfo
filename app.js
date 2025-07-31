@@ -1,321 +1,35 @@
-// ZoomInfo Account Data - Updated with new columns
-const zoomInfoData = [
-  {
-    "Company Name": "Innovative Inc",
-    "Who it is assigned to": "Taylor Smith",
-    "Account Type": "Prospect",
-    "Prospect Score": 90,
-    "Account Notes": "Top 10 account",
-    "Drop Notes": "Do not call",
-    "Website": "www.innovativeinc.com",
-    "LinkedinURL": "https://linkedin.com/company/0",
-    "Revenue Estimate": "$10 mil. - $25 mil.",
-    "# of Employees": 82,
-    "Head Office": "Charlotte, North Carolina",
-    "Country": "United States",
-    "Segmentation": "Mid-Market"
-  },
-  {
-    "Company Name": "Global Corp",
-    "Who it is assigned to": "Taylor Smith",
-    "Account Type": "Suspect",
-    "Prospect Score": 94,
-    "Account Notes": "Strong pipeline",
-    "Drop Notes": "Do not call",
-    "Website": "www.globalcorp.com",
-    "LinkedinURL": "https://linkedin.com/company/1",
-    "Revenue Estimate": "$5 mil. - $10 mil.",
-    "# of Employees": 39,
-    "Head Office": "Raleigh, North Carolina",
-    "Country": "United States",
-    "Segmentation": "Enterprise"
-  },
-  {
-    "Company Name": "Fusion Group",
-    "Who it is assigned to": "Morgan Lee",
-    "Account Type": "Suspect",
-    "Prospect Score": 83,
-    "Account Notes": "Follow-up Q3",
-    "Drop Notes": "Nurture",
-    "Website": "www.fusiongroup.com",
-    "LinkedinURL": "https://linkedin.com/company/2",
-    "Revenue Estimate": "$10 mil. - $25 mil.",
-    "# of Employees": 21,
-    "Head Office": "Henderson, Nevada",
-    "Country": "United States",
-    "Segmentation": "SMB"
-  },
-  {
-    "Company Name": "Momentum Corp",
-    "Who it is assigned to": "Taylor Smith",
-    "Account Type": "Customer",
-    "Prospect Score": 88,
-    "Account Notes": "Repeat outreach",
-    "Drop Notes": "Check in 2026",
-    "Website": "www.momentumcorp.com",
-    "LinkedinURL": "https://linkedin.com/company/3",
-    "Revenue Estimate": "$500,000 - $1 mil.",
-    "# of Employees": 7,
-    "Head Office": "San Antonio, Texas",
-    "Country": "United States",
-    "Segmentation": "Mid-Market"
-  },
-  {
-    "Company Name": "Innovative Systems",
-    "Who it is assigned to": "Jordan Green",
-    "Account Type": "Prospect",
-    "Prospect Score": 89,
-    "Account Notes": "Repeat outreach",
-    "Drop Notes": "Ready if budget",
-    "Website": "www.innovativesystems.com",
-    "LinkedinURL": "https://linkedin.com/company/4",
-    "Revenue Estimate": "$500,000 - $1 mil.",
-    "# of Employees": 9,
-    "Head Office": "Denver, Colorado",
-    "Country": "United States",
-    "Segmentation": "Enterprise"
-  },
-  {
-    "Company Name": "Apex Enterprises",
-    "Who it is assigned to": "Jordan Green",
-    "Account Type": "Prospect",
-    "Prospect Score": 75,
-    "Account Notes": "Repeat outreach",
-    "Drop Notes": "Do not call",
-    "Website": "www.apexenterprises.com",
-    "LinkedinURL": "https://linkedin.com/company/5",
-    "Revenue Estimate": "$10 mil. - $25 mil.",
-    "# of Employees": 40,
-    "Head Office": "Charlotte, North Carolina",
-    "Country": "United States",
-    "Segmentation": "SMB"
-  },
-  {
-    "Company Name": "Velocity Ltd",
-    "Who it is assigned to": "Morgan Lee",
-    "Account Type": "Target",
-    "Prospect Score": 55,
-    "Account Notes": "High potential",
-    "Drop Notes": "Do not call",
-    "Website": "www.velocityltd.com",
-    "LinkedinURL": "https://linkedin.com/company/6",
-    "Revenue Estimate": "Over $5 bil.",
-    "# of Employees": 39993,
-    "Head Office": "Santa Ana, California",
-    "Country": "United States",
-    "Segmentation": "SMB"
-  },
-  {
-    "Company Name": "Future Technologies",
-    "Who it is assigned to": "Morgan Lee",
-    "Account Type": "Target",
-    "Prospect Score": 72,
-    "Account Notes": "Top 10 account",
-    "Drop Notes": "Do not call",
-    "Website": "www.futuretechnologies.com",
-    "LinkedinURL": "https://linkedin.com/company/7",
-    "Revenue Estimate": "$50 mil. - $100 mil.",
-    "# of Employees": 238,
-    "Head Office": "Bakersfield, California",
-    "Country": "United States",
-    "Segmentation": "Mid-Market"
-  },
-  {
-    "Company Name": "Synergy Systems",
-    "Who it is assigned to": "Alex Kim",
-    "Account Type": "Prospect",
-    "Prospect Score": 74,
-    "Account Notes": "Top 10 account",
-    "Drop Notes": "Do not call",
-    "Website": "www.synergysystems.com",
-    "LinkedinURL": "https://linkedin.com/company/8",
-    "Revenue Estimate": "$10 mil. - $25 mil.",
-    "# of Employees": 36,
-    "Head Office": "Columbus, Ohio",
-    "Country": "United States",
-    "Segmentation": "SMB"
-  },
-  {
-    "Company Name": "Pioneer LLC",
-    "Who it is assigned to": "Taylor Smith",
-    "Account Type": "Customer",
-    "Prospect Score": 60,
-    "Account Notes": "High potential",
-    "Drop Notes": "Nurture",
-    "Website": "www.pioneerllc.com",
-    "LinkedinURL": "https://linkedin.com/company/9",
-    "Revenue Estimate": "$10 mil. - $25 mil.",
-    "# of Employees": 55,
-    "Head Office": "Fort Worth, Texas",
-    "Country": "United States",
-    "Segmentation": "SMB"
-  },
-  {
-    "Company Name": "Dynamic Solutions",
-    "Who it is assigned to": "Morgan Lee",
-    "Account Type": "Suspect",
-    "Prospect Score": 97,
-    "Account Notes": "High potential",
-    "Drop Notes": "Ready if budget",
-    "Website": "www.dynamicsolutions.com",
-    "LinkedinURL": "https://linkedin.com/company/10",
-    "Revenue Estimate": "$25 mil. - $50 mil.",
-    "# of Employees": 125,
-    "Head Office": "Seattle, Washington",
-    "Country": "United States",
-    "Segmentation": "Enterprise"
-  },
-  {
-    "Company Name": "Strategic Partners",
-    "Who it is assigned to": "Morgan Lee",
-    "Account Type": "Customer",
-    "Prospect Score": 89,
-    "Account Notes": "Repeat outreach",
-    "Drop Notes": "Nurture",
-    "Website": "www.strategicpartners.com",
-    "LinkedinURL": "https://linkedin.com/company/11",
-    "Revenue Estimate": "$100 mil. - $250 mil.",
-    "# of Employees": 450,
-    "Head Office": "Chicago, Illinois",
-    "Country": "United States",
-    "Segmentation": "Mid-Market"
-  },
-  {
-    "Company Name": "Elite Manufacturing",
-    "Who it is assigned to": "Jordan Green",
-    "Account Type": "Target",
-    "Prospect Score": 58,
-    "Account Notes": "Top 10 account",
-    "Drop Notes": "Do not call",
-    "Website": "www.elitemanufacturing.com",
-    "LinkedinURL": "https://linkedin.com/company/12",
-    "Revenue Estimate": "$250 mil. - $500 mil.",
-    "# of Employees": 1250,
-    "Head Office": "Detroit, Michigan",
-    "Country": "United States",
-    "Segmentation": "SMB"
-  },
-  {
-    "Company Name": "Digital Media Group",
-    "Who it is assigned to": "Alex Kim",
-    "Account Type": "Target",
-    "Prospect Score": 69,
-    "Account Notes": "Repeat outreach",
-    "Drop Notes": "Nurture",
-    "Website": "www.digitalmediagroup.com",
-    "LinkedinURL": "https://linkedin.com/company/13",
-    "Revenue Estimate": "$50 mil. - $100 mil.",
-    "# of Employees": 180,
-    "Head Office": "Los Angeles, California",
-    "Country": "United States",
-    "Segmentation": "Mid-Market"
-  },
-  {
-    "Company Name": "Healthcare Innovations",
-    "Who it is assigned to": "Jordan Green",
-    "Account Type": "Prospect",
-    "Prospect Score": 68,
-    "Account Notes": "Strong pipeline",
-    "Drop Notes": "Do not call",
-    "Website": "www.healthcareinnovations.com",
-    "LinkedinURL": "https://linkedin.com/company/14",
-    "Revenue Estimate": "$100 mil. - $250 mil.",
-    "# of Employees": 650,
-    "Head Office": "Boston, Massachusetts",
-    "Country": "United States",
-    "Segmentation": "Mid-Market"
-  },
-  {
-    "Company Name": "Energy Solutions Inc",
-    "Who it is assigned to": "Jordan Green",
-    "Account Type": "Suspect",
-    "Prospect Score": 59,
-    "Account Notes": "Follow-up Q3",
-    "Drop Notes": "Check in 2026",
-    "Website": "www.energysolutionsinc.com",
-    "LinkedinURL": "https://linkedin.com/company/15",
-    "Revenue Estimate": "$500 mil. - $1 bil.",
-    "# of Employees": 2800,
-    "Head Office": "Houston, Texas",
-    "Country": "United States",
-    "Segmentation": "Enterprise"
-  },
-  {
-    "Company Name": "Construction Masters",
-    "Who it is assigned to": "Taylor Smith",
-    "Account Type": "Customer",
-    "Prospect Score": 95,
-    "Account Notes": "Repeat outreach",
-    "Drop Notes": "Check in 2026",
-    "Website": "www.constructionmasters.com",
-    "LinkedinURL": "https://linkedin.com/company/16",
-    "Revenue Estimate": "$25 mil. - $50 mil.",
-    "# of Employees": 95,
-    "Head Office": "Phoenix, Arizona",
-    "Country": "United States",
-    "Segmentation": "Enterprise"
-  },
-  {
-    "Company Name": "Telecom Networks",
-    "Who it is assigned to": "Taylor Smith",
-    "Account Type": "Suspect",
-    "Prospect Score": 71,
-    "Account Notes": "Top 10 account",
-    "Drop Notes": "Nurture",
-    "Website": "www.telecomnetworks.com",
-    "LinkedinURL": "https://linkedin.com/company/17",
-    "Revenue Estimate": "$100 mil. - $250 mil.",
-    "# of Employees": 520,
-    "Head Office": "Atlanta, Georgia",
-    "Country": "United States",
-    "Segmentation": "SMB"
-  },
-  {
-    "Company Name": "Real Estate Pros",
-    "Who it is assigned to": "Jordan Green",
-    "Account Type": "Suspect",
-    "Prospect Score": 87,
-    "Account Notes": "Strong pipeline",
-    "Drop Notes": "Ready if budget",
-    "Website": "www.realestatepros.com",
-    "LinkedinURL": "https://linkedin.com/company/18",
-    "Revenue Estimate": "$10 mil. - $25 mil.",
-    "# of Employees": 35,
-    "Head Office": "Miami, Florida",
-    "Country": "United States",
-    "Segmentation": "Mid-Market"
-  },
-  {
-    "Company Name": "Retail Giants",
-    "Who it is assigned to": "Alex Kim",
-    "Account Type": "Suspect",
-    "Prospect Score": 79,
-    "Account Notes": "Strong pipeline",
-    "Drop Notes": "Ready if budget",
-    "Website": "www.retailgiants.com",
-    "LinkedinURL": "https://linkedin.com/company/19",
-    "Revenue Estimate": "$250 mil. - $500 mil.",
-    "# of Employees": 1800,
-    "Head Office": "Minneapolis, Minnesota",
-    "Country": "United States",
-    "Segmentation": "SMB"
-  }
-];
-
-
-let filteredData = [...zoomInfoData];
+// ========== DATA ==========
+let zoomInfoData = [];
+let filteredData = [];
 let currentSortColumn = null;
 let currentSortDirection = 'asc';
 
-let revenueFilter, minEmployeesInput, maxEmployeesInput, assignedToFilter,
+let revenueFilter, minEmployeesInput, maxEmployeesInput, locationFilter,
     searchInput, resultsBody, resultsCount, clearFiltersBtn, exportDataBtn, loadingIndicator;
 
-// ========= INIT ==========
+// ========== CSV LOAD AND INIT ==========
 document.addEventListener('DOMContentLoaded', function () {
+    // After password protection, load CSV:
+    Papa.parse('data.csv', {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: function (results) {
+            zoomInfoData = results.data;
+            filteredData = [...zoomInfoData];
+            initializeDashboard();
+        },
+        error: function(err) {
+            alert("Failed to load data.csv: " + err);
+        }
+    });
+});
+
+function initializeDashboard() {
     revenueFilter = document.getElementById('revenueFilter');
     minEmployeesInput = document.getElementById('minEmployees');
     maxEmployeesInput = document.getElementById('maxEmployees');
-    assignedToFilter = document.getElementById('assignedToFilter');
+    locationFilter = document.getElementById('locationFilter');
     searchInput = document.getElementById('searchInput');
     resultsBody = document.getElementById('resultsBody');
     resultsCount = document.getElementById('resultsCount');
@@ -323,11 +37,10 @@ document.addEventListener('DOMContentLoaded', function () {
     exportDataBtn = document.getElementById('exportData');
     loadingIndicator = document.getElementById('loadingIndicator');
 
-    populateAssignedToFilter();
+    populateLocationFilter();
     attachEventListeners();
-    filteredData = [...zoomInfoData];
     renderTable();
-});
+}
 
 // ======= FILTER =======
 function handleFilterChange() {
@@ -350,15 +63,16 @@ function applyAllFilters() {
     const minEmployees = parseInt(minEmployeesInput.value) || 0;
     const maxEmployees = parseInt(maxEmployeesInput.value) || Number.MAX_SAFE_INTEGER;
     data = data.filter(item => {
-        const empCount = item['# of Employees'];
+        const empCount = Number(item['Employees']);
         return empCount >= minEmployees && empCount <= maxEmployees;
     });
 
-    // Assigned To
-    const selectedAssignees = getSelectedOptions(assignedToFilter);
-    if (selectedAssignees.length > 0) {
+    // Location
+    const selectedCities = getSelectedOptions(locationFilter);
+    if (selectedCities.length > 0) {
         data = data.filter(item => {
-            return selectedAssignees.includes(item['Who it is assigned to']);
+            const city = (item['Head Office'] || '').split(',')[0].trim();
+            return selectedCities.includes(city);
         });
     }
 
@@ -387,7 +101,7 @@ function getSelectedOptions(selectElement) {
 // ======= SORTING & CLEAR =======
 function clearAllFilters() {
     revenueFilter.selectedIndex = -1;
-    assignedToFilter.selectedIndex = -1;
+    locationFilter.selectedIndex = -1;
     minEmployeesInput.value = '';
     maxEmployeesInput.value = '';
     searchInput.value = '';
@@ -411,15 +125,15 @@ function sortTable(column) {
 function applySorting() {
     filteredData.sort((a, b) => {
         let aVal, bVal;
-        if (currentSortColumn === '# of Employees') {
-            aVal = Number(a['# of Employees']);
-            bVal = Number(b['# of Employees']);
+        if (currentSortColumn === 'Employees') {
+            aVal = Number(a['Employees']);
+            bVal = Number(b['Employees']);
         } else if (currentSortColumn === 'Prospect Score') {
             aVal = Number(a['Prospect Score']);
             bVal = Number(b['Prospect Score']);
         } else {
-            aVal = a[currentSortColumn];
-            bVal = b[currentSortColumn];
+            aVal = a[currentSortColumn] || "";
+            bVal = b[currentSortColumn] || "";
         }
         if (typeof aVal === 'string' && typeof bVal === 'string') {
             aVal = aVal.toLowerCase();
@@ -446,7 +160,7 @@ function updateSortIndicators() {
 function renderTable() {
     if (!resultsBody) return;
     resultsBody.innerHTML = '';
-    if (filteredData.length === 0) {
+    if (!Array.isArray(filteredData) || filteredData.length === 0) {
         resultsBody.innerHTML = `<tr>
             <td colspan="13" class="no-results">
                 <h3>No accounts found</h3>
@@ -456,25 +170,24 @@ function renderTable() {
         updateResultsCount(0);
         return;
     }
-
     filteredData.forEach(item => {
         const row = document.createElement('tr');
-        const website = item.Website.startsWith('http') ? item.Website : `https://${item.Website}`;
-        const linkedinURL = item.LinkedinURL || '#';
+        const website = (item['Website'] || '').startsWith('http') ? item['Website'] : `https://${item['Website']}`;
+
         row.innerHTML = `
-            <td><strong>${escapeHtml(item['Company Name'])}</strong></td>
-            <td>${escapeHtml(item['Who it is assigned to'] || 'Unassigned')}</td>
+            <td><strong>${escapeHtml(item['Company Name'] || '')}</strong></td>
+            <td>${escapeHtml(item['Assigned To'] || 'Unassigned')}</td>
             <td><span class="status status--info">${escapeHtml(item['Account Type'] || 'N/A')}</span></td>
             <td><span style="${getScoreStyle(item['Prospect Score'])}">${item['Prospect Score'] || 'N/A'}</span></td>
             <td>${escapeHtml(item['Account Notes'] || '')}</td>
             <td>${escapeHtml(item['Drop Notes'] || '')}</td>
-            <td><a href="${website}" target="_blank">${escapeHtml(item.Website)}</a></td>
-            <td>${item.LinkedinURL ? `<a href="${linkedinURL}" target="_blank">LinkedIn</a>` : 'N/A'}</td>
-            <td><span class="${getRevenueClass(item['Revenue Estimate'])}">${escapeHtml(item['Revenue Estimate'])}</span></td>
-            <td>${item['# of Employees'].toLocaleString()}</td>
-            <td>${escapeHtml(item['Head Office'])}</td>
-            <td>${escapeHtml(item.Country)}</td>
-            <td><span class="status status--success">${escapeHtml(item.Segmentation || 'N/A')}</span></td>
+            <td><a href="${website}" target="_blank">${escapeHtml(item['Website'] || '')}</a></td>
+            <td>${item['LinkedIn URL'] ? `<a href="${item['LinkedIn URL']}" target="_blank">LinkedIn</a>` : 'N/A'}</td>
+            <td><span class="${getRevenueClass(item['Revenue Estimate'] || '')}">${escapeHtml(item['Revenue Estimate'] || '')}</span></td>
+            <td>${Number(item['Employees'] || 0).toLocaleString()}</td>
+            <td>${escapeHtml(item['Head Office'] || '')}</td>
+            <td>${escapeHtml(item['Country'] || '')}</td>
+            <td><span class="status status--success">${escapeHtml(item['Segmentation'] || 'N/A')}</span></td>
         `;
         resultsBody.appendChild(row);
     });
@@ -482,8 +195,9 @@ function renderTable() {
     highlightSearchTerms();
 }
 function getScoreStyle(score) {
-    // Soft pastel readable badge
-    let normalized = Math.max(0, Math.min(100, score)) / 100;
+    let num = Number(score);
+    if (isNaN(num)) num = 0;
+    let normalized = Math.max(0, Math.min(100, num)) / 100;
     let hue = 0 + 120 * normalized;
     let saturation = 38;
     let lightness = 91;
@@ -491,16 +205,17 @@ function getScoreStyle(score) {
     return `background-color: hsl(${hue},${saturation}%,${lightness}%); color: ${textColor}; font-weight: bold; font-size: 1.05em; padding: 6px 10px; border-radius: 6px; min-width: 38px; display: inline-block; text-align: center; letter-spacing: 0.5px;`;
 }
 function getRevenueClass(revenue) {
-    if (revenue.includes('bil.') || revenue.includes('$500 mil. - $1 bil.') || revenue.includes('$250 mil. - $500 mil.') || revenue.includes('$100 mil. - $250 mil.')) {
+    let s = revenue || '';
+    if (s.includes('bil.') || s.includes('$500 mil. - $1 bil.') || s.includes('$250 mil. - $500 mil.') || s.includes('$100 mil. - $250 mil.')) {
         return 'revenue-high';
-    } else if (revenue.includes('$50 mil.') || revenue.includes('$25 mil.')) {
+    } else if (s.includes('$50 mil.') || s.includes('$25 mil.')) {
         return 'revenue-medium';
     }
     return 'revenue-low';
 }
 // ======= CSV EXPORT, COUNTERS, ETC. =======
 function exportToCSV() {
-    if (filteredData.length === 0) {
+    if (!filteredData || filteredData.length === 0) {
         alert('No data to export. Please adjust your filters.');
         return;
     }
@@ -526,22 +241,7 @@ function exportToCSV() {
     document.body.removeChild(link);
 }
 function getCSVValue(item, key) {
-    switch (key) {
-        case 'Company Name': return item['Company Name'];
-        case 'Assigned To': return item['Who it is assigned to'];
-        case 'Account Type': return item['Account Type'];
-        case 'Prospect Score': return String(item['Prospect Score']);
-        case 'Account Notes': return item['Account Notes'];
-        case 'Drop Notes': return item['Drop Notes'];
-        case 'Website': return item.Website;
-        case 'LinkedIn URL': return item.LinkedinURL;
-        case 'Revenue Estimate': return item['Revenue Estimate'];
-        case 'Employees': return String(item['# of Employees']);
-        case 'Head Office': return item['Head Office'];
-        case 'Country': return item.Country;
-        case 'Segmentation': return item.Segmentation;
-        default: return '';
-    }
+    return String(item[key] || '');
 }
 function updateResultsCount(count) {
     if (resultsCount) {
@@ -556,7 +256,7 @@ function highlightSearchTerms() {
     if (!searchTerm) return;
     const regex = new RegExp(escapeRegex(searchTerm), 'gi');
     resultsBody.querySelectorAll('td').forEach(cell => {
-        if (cell.querySelector('a')) return; // Don't break links
+        if (cell.querySelector('a')) return;
         const text = cell.textContent;
         if (regex.test(text)) {
             cell.innerHTML = text.replace(regex, match =>
@@ -588,10 +288,9 @@ function debounce(func, wait) {
         timeout = setTimeout(later, wait);
     };
 }
-// ======= EVENT WIRING =======
 function attachEventListeners() {
     revenueFilter.addEventListener('change', handleFilterChange);
-    assignedToFilter.addEventListener('change', handleFilterChange);
+    locationFilter.addEventListener('change', handleFilterChange);
     minEmployeesInput.addEventListener('input', debounce(handleFilterChange, 300));
     maxEmployeesInput.addEventListener('input', debounce(handleFilterChange, 300));
     searchInput.addEventListener('input', debounce(handleFilterChange, 300));
@@ -601,25 +300,26 @@ function attachEventListeners() {
         header.addEventListener('click', () => sortTable(header.dataset.sort));
     });
 }
-function populateAssignedToFilter() {
-    const uniqueAssignees = [
+function populateLocationFilter() {
+    const uniqueCities = [
         ...new Set(
             zoomInfoData
-                .map(item => item['Who it is assigned to'])
-                .filter(assignee => assignee)
+                .map(item => {
+                    const headOffice = item['Head Office'] || '';
+                    return headOffice.split(',')[0].trim();
+                })
+                .filter(city => city)
         )
     ].sort();
-    
-    assignedToFilter.innerHTML = '';
+    locationFilter.innerHTML = '';
     const defaultOption = document.createElement('option');
     defaultOption.value = '';
-    defaultOption.textContent = 'All Assignees';
-    assignedToFilter.appendChild(defaultOption);
-    
-    uniqueAssignees.forEach(assignee => {
+    defaultOption.textContent = 'All Locations';
+    locationFilter.appendChild(defaultOption);
+    uniqueCities.forEach(city => {
         const option = document.createElement('option');
-        option.value = assignee;
-        option.textContent = assignee;
-        assignedToFilter.appendChild(option);
+        option.value = city;
+        option.textContent = city;
+        locationFilter.appendChild(option);
     });
 }
