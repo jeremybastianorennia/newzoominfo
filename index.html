@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TAM Dashboard</title>
     <link rel="stylesheet" href="style.css">
-    <!-- PapaParse CSV library -->
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     <script>
         const correctPassword = "flames";
@@ -25,7 +24,6 @@
         document.addEventListener('DOMContentLoaded', function() { checkPassword(); });
     </script>
 </head>
-
 <body>
     <div class="container">
         <header class="header">
@@ -33,9 +31,9 @@
             <p class="subtitle">Filter and analyze enriched ZoomInfo account data to identify and qualify prospects</p>
         </header>
 
-        <!-- Filter Controls -->
         <section class="filters-section">
             <div class="filters-grid">
+
                 <div class="card filter-card">
                     <h3>Revenue Range</h3>
                     <div class="form-group">
@@ -54,6 +52,7 @@
                         </select>
                     </div>
                 </div>
+
                 <div class="card filter-card">
                     <h3>Employee Count</h3>
                     <div class="employee-inputs">
@@ -67,14 +66,25 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="card filter-card">
-                    <h3>Location (City)</h3>
+                    <h3>Segmentation</h3>
                     <div class="form-group">
-                        <select id="locationFilter" class="form-control" multiple size="6">
-                            <!-- Options from JS -->
+                        <select id="segmentationFilter" class="form-control" multiple size="6">
+                            <!-- Options will be populated by JS -->
                         </select>
                     </div>
                 </div>
+
+                <div class="card filter-card">
+                    <h3>Assigned To</h3>
+                    <div class="form-group">
+                        <select id="assignedToFilter" class="form-control" multiple size="6">
+                            <!-- Options will be populated by JS -->
+                        </select>
+                    </div>
+                </div>
+
                 <div class="card filter-card">
                     <h3>Actions</h3>
                     <div class="action-buttons">
@@ -84,6 +94,7 @@
                 </div>
             </div>
         </section>
+
         <section class="results-section">
             <div class="card">
                 <div class="card__header">
@@ -117,9 +128,7 @@
                                     <th data-sort="Segmentation">Segmentation <span class="sort-indicator"></span></th>
                                 </tr>
                             </thead>
-                            <tbody id="resultsBody">
-                                <!-- Populated by JS -->
-                            </tbody>
+                            <tbody id="resultsBody"></tbody>
                         </table>
                     </div>
                 </div>
