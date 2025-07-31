@@ -333,7 +333,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize with all data visible
     filteredData = [...zoomInfoData];
     console.log('Filtered data length:', filteredData.length);
-    renderTable();
+    ();
 });
 
 // Populate location filter with unique cities
@@ -375,7 +375,7 @@ function handleFilterChange() {
     
     setTimeout(() => {
         applyAllFilters();
-        renderTable();
+        ();
         hideLoading();
     }, 50);
 }
@@ -553,33 +553,6 @@ function renderTable() {
     highlightSearchTerms();
 }
 
-
-    filteredData.forEach(item => {
-        const row = document.createElement('tr');
-        const website = item.Website.startsWith('http') ? item.Website : `https://${item.Website}`;
-        const linkedinURL = item.LinkedinURL || '#';
-        
-        row.innerHTML = `
-            <td><strong>${escapeHtml(item['Company Name'])}</strong></td>
-            <td>${escapeHtml(item['Who it is assigned to'] || 'Unassigned')}</td>
-            <td><span class="status status--info">${escapeHtml(item['Account Type'] || 'N/A')}</span></td>
-            <td><span class="${getScoreClass(item['Prospect Score'])}">${item['Prospect Score'] || 'N/A'}</span></td>
-            <td>${escapeHtml(item['Account Notes'] || '')}</td>
-            <td>${escapeHtml(item['Drop Notes'] || '')}</td>
-            <td><a href="${website}" target="_blank">${escapeHtml(item.Website)}</a></td>
-            <td>${item.LinkedinURL ? `<a href="${linkedinURL}" target="_blank">LinkedIn</a>` : 'N/A'}</td>
-            <td><span class="${getRevenueClass(item['Revenue Estimate'])}">${escapeHtml(item['Revenue Estimate'])}</span></td>
-            <td>${item['# of Employees'].toLocaleString()}</td>
-            <td>${escapeHtml(item['Head Office'])}</td>
-            <td>${escapeHtml(item.Country)}</td>
-            <td><span class="status status--success">${escapeHtml(item.Segmentation || 'N/A')}</span></td>
-        `;
-        resultsBody.appendChild(row);
-    });
-
-    updateResultsCount(filteredData.length);
-    highlightSearchTerms();
-}
 
 // Export current filtered data to CSV
 function exportToCSV() {
