@@ -665,17 +665,17 @@ function getRevenueClass(revenue) {
 function getScoreStyle(score) {
     // Normalize between 0 and 100
     let normalized = Math.max(0, Math.min(100, score)) / 100;
-    // Hue: 0 = red, 60 = yellow, 120 = green
-    let hue = 0 + 120 * normalized; // 0 (red) to 120 (green)
-    let saturation = 55; // Softened (was 100)
-    let lightness = 74; // Softer, pastel tone
+    // Red (0) to Yellow (60) to Green (120)
+    let hue = 0 + 120 * normalized;
+    let saturation = 38;  // much lower, softer pastel
+    let lightness = 91;   // very light background
 
-    // Set readable text color
-    let textColor = (normalized > 0.6) ? '#222' : '#333';
+    // Always use strong contrast for text
+    let textColor = '#1a1a1a';
 
-    // Return style string
-    return `background-color: hsl(${hue},${saturation}%,${lightness}%); color: ${textColor}; font-weight: 600; padding: 4px 8px; border-radius: 6px; min-width: 30px; display: inline-block; text-align: center;`;
+    return `background-color: hsl(${hue},${saturation}%,${lightness}%); color: ${textColor}; font-weight: bold; font-size: 1.05em; padding: 6px 10px; border-radius: 6px; min-width: 38px; display: inline-block; text-align: center; letter-spacing: 0.5px;`;
 }
+
 
 function highlightSearchTerms() {
     const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
