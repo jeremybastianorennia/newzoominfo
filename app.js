@@ -304,6 +304,8 @@ const zoomInfoData = [
 let filteredData = [...zoomInfoData];
 let currentSortColumn = null;
 let currentSortDirection = 'asc';
+let prospectScoreMinInput, prospectScoreMaxInput, scoreMinValue, scoreMaxValue;
+
 
 // DOM elements
 let revenueFilter, minEmployeesInput, maxEmployeesInput, locationFilter, 
@@ -323,6 +325,11 @@ document.addEventListener('DOMContentLoaded', function () {
     clearFiltersBtn = document.getElementById('clearFilters');
     exportDataBtn = document.getElementById('exportData');
     loadingIndicator = document.getElementById('loadingIndicator');
+  prospectScoreMinInput = document.getElementById('prospectScoreMin');
+prospectScoreMaxInput = document.getElementById('prospectScoreMax');
+scoreMinValue = document.getElementById('scoreMinValue');
+scoreMaxValue = document.getElementById('scoreMaxValue');
+
 
     populateLocationFilter();
     attachEventListeners();
@@ -372,6 +379,9 @@ function attachEventListeners() {
     searchInput.addEventListener('input', debounce(handleFilterChange, 300));
     clearFiltersBtn.addEventListener('click', clearAllFilters);
     exportDataBtn.addEventListener('click', exportToCSV);
+  prospectScoreMinInput.addEventListener('input', handleProspectScoreRange);
+prospectScoreMaxInput.addEventListener('input', handleProspectScoreRange);
+
 
     document.querySelectorAll('[data-sort]').forEach(header => {
         header.addEventListener('click', () => sortTable(header.dataset.sort));
@@ -384,6 +394,25 @@ function handleFilterChange() {
         applyAllFilters();
         hideLoading();
     }, 50);
+}
+function handleProspectScoreRange() {
+    let min = parseInt(prospectScoreMinInput.value, 10);
+    let max = parseInt(prospectScoreMaxInput.value, 10);
+
+    if (min > max) {
+        if (event.target === prospectScoreMinInput) {
+            prospectScoreMinInput.value = max;
+            min = max;
+        } else {
+            prospectScoreMaxInput.value = min;
+            max = min;
+        }
+    }
+
+    scoreMinValue.textContent = min;
+    scoreMaxValue.textContent = max;
+
+    handleFilterChange();
 }
 
 function applyAllFilters() {
@@ -418,6 +447,12 @@ function applyAllFilters() {
             );
         });
     }
+const scoreMin = parseInt(prospectScoreMinInput.value, 10) || 0;
+const scoreMax = parseInt(prospectScoreMaxInput.value, 10) || 100;
+data = data.filter(item => {
+    const ps = Number(item["Prospect Score"]);
+    return ps >= scoreMin && ps <= scoreMax;
+});
 
     filteredData = data;
 
