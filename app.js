@@ -305,8 +305,6 @@ let filteredData = [...zoomInfoData];
 let currentSortColumn = null;
 let currentSortDirection = 'asc';
 let prospectScoreMinInput, prospectScoreMaxInput, scoreMinValue, scoreMaxValue;
-let prospectScoreSlider, scoreMinValue, scoreMaxValue;
-
 
 
 // DOM elements
@@ -331,30 +329,6 @@ document.addEventListener('DOMContentLoaded', function () {
 prospectScoreMaxInput = document.getElementById('prospectScoreMax');
 scoreMinValue = document.getElementById('scoreMinValue');
 scoreMaxValue = document.getElementById('scoreMaxValue');
-  prospectScoreSlider = document.getElementById('prospectScoreSlider');
-scoreMinValue = document.getElementById('scoreMinValue');
-scoreMaxValue = document.getElementById('scoreMaxValue');
-
-noUiSlider.create(prospectScoreSlider, {
-    start: [0, 100],
-    connect: true,
-    step: 1,
-    range: { min: 0, max: 100 },
-    tooltips: true,
-    format: {
-      to: value => Math.round(value),
-      from: value => Number(value)
-    }
-});
-
-prospectScoreSlider.noUiSlider.on('update', function(values) {
-    let min = Math.round(values[0]);
-    let max = Math.round(values[1]);
-    scoreMinValue.textContent = min;
-    scoreMaxValue.textContent = max;
-    handleFilterChange();
-});
-
 
 
     populateLocationFilter();
@@ -473,13 +447,8 @@ function applyAllFilters() {
             );
         });
     }
-let scoreMin = 0, scoreMax = 100;
-if (prospectScoreSlider && prospectScoreSlider.noUiSlider) {
-    const arr = prospectScoreSlider.noUiSlider.get().map(Number);
-    scoreMin = arr[0];
-    scoreMax = arr[1];
-}
-
+const scoreMin = parseInt(prospectScoreMinInput.value, 10) || 0;
+const scoreMax = parseInt(prospectScoreMaxInput.value, 10) || 100;
 data = data.filter(item => {
     const ps = Number(item["Prospect Score"]);
     return ps >= scoreMin && ps <= scoreMax;
