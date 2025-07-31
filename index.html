@@ -26,7 +26,6 @@ function checkPassword() {
         document.body.style.display = 'none';
     }
 }
-
 // Hide content initially and check password when page loads
 document.body.style.display = 'none';
 document.addEventListener('DOMContentLoaded', function() {
@@ -92,25 +91,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>
 <!-- Add this inside .filters-grid wherever filters are, before Actions card -->
-<div class="card filter-card">
+    <div class="card filter-card">
   <h3>Prospect Score Range</h3>
-  <div class="form-group" style="padding:8px 0;">
-    <input 
-      type="range" 
-      id="prospectScoreMin" 
-      min="0" max="100" step="1" 
-      value="0" 
-      style="width: 38%; display:inline;">
-    <span id="scoreMinValue" style="margin: 0 8px;">0</span>
-    <span style="font-weight: bold;">–</span>
-    <span id="scoreMaxValue" style="margin: 0 8px;">100</span>
-    <input 
-      type="range" 
-      id="prospectScoreMax" 
-      min="0" max="100" step="1" 
-      value="100" 
-      style="width: 38%; display:inline;">
+  <div id="prospectScoreSlider" style="margin: 24px 0;"></div>
+  <div style="display:flex; justify-content:space-between; font-size:1em; margin-top: 8px;">
+    <span>Min: <span id="scoreMinValue">0</span></span>
+    <span>Max: <span id="scoreMaxValue">100</span></span>
   </div>
+</div>
+
 </div>
 
                 <!-- Action Buttons -->
