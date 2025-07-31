@@ -317,34 +317,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Clear table
     tbody.innerHTML = '';
-
-// Dynamic color gradient for prospect score (red → yellow → green)
-function getScoreStyle(score) {
-    // Ensure the score is between 0 and 100
-    let normalized = Math.max(0, Math.min(100, score)) / 100;
-    // Color stops: 0=red, 0.5=yellow, 1=green
-    let r, g, b;
-    if (normalized < 0.5) {
-        // Red to Yellow
-        r = 255;
-        g = Math.round(510 * normalized); // 0 to 255 as score goes 0-50
-        b = 0;
-    } else {
-        // Yellow to Green
-        r = Math.round(510 * (1 - normalized)); // 255 to 0 as score goes 50-100
-        g = 255;
-        b = 0;
-    }
-
-  <td><span style="${getScoreStyle(item['Prospect Score'])}">
-    ${item['Prospect Score'] || 'N/A'}
-</span></td>
-
-    // Light text on dark color, dark text on bright
-    let textColor = (g < 180 && r > 160) ? 'black' : 'white';
-    // Style string
-    return `background-color: rgb(${r}, ${g}, ${b}); color: ${textColor}; font-weight: 600; padding: 4px 8px; border-radius: 6px; min-width: 30px; display: inline-block; text-align: center;`;
-}
     
     // Add each row
     zoomInfoData.forEach(item => {
