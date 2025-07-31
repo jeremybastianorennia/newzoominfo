@@ -302,7 +302,7 @@ const zoomInfoData = [
   }
 ];
 
-// ====== GLOBALS ======
+
 let filteredData = [...zoomInfoData];
 let currentSortColumn = null;
 let currentSortDirection = 'asc';
@@ -310,7 +310,26 @@ let currentSortDirection = 'asc';
 let revenueFilter, minEmployeesInput, maxEmployeesInput, locationFilter,
     searchInput, resultsBody, resultsCount, clearFiltersBtn, exportDataBtn, loadingIndicator;
 
-// ====== FILTER FUNCTIONS ======
+// ========= INIT ==========
+document.addEventListener('DOMContentLoaded', function () {
+    revenueFilter = document.getElementById('revenueFilter');
+    minEmployeesInput = document.getElementById('minEmployees');
+    maxEmployeesInput = document.getElementById('maxEmployees');
+    locationFilter = document.getElementById('locationFilter');
+    searchInput = document.getElementById('searchInput');
+    resultsBody = document.getElementById('resultsBody');
+    resultsCount = document.getElementById('resultsCount');
+    clearFiltersBtn = document.getElementById('clearFilters');
+    exportDataBtn = document.getElementById('exportData');
+    loadingIndicator = document.getElementById('loadingIndicator');
+
+    populateLocationFilter();
+    attachEventListeners();
+    filteredData = [...zoomInfoData];
+    renderTable();
+});
+
+// ======= FILTER =======
 function handleFilterChange() {
     showLoading();
     setTimeout(() => {
@@ -318,17 +337,16 @@ function handleFilterChange() {
         hideLoading();
     }, 50);
 }
-
 function applyAllFilters() {
     let data = [...zoomInfoData];
 
-    // Revenue filter
+    // Revenue
     const selectedRevenues = getSelectedOptions(revenueFilter);
     if (selectedRevenues.length > 0) {
         data = data.filter(item => selectedRevenues.includes(item['Revenue Estimate']));
     }
 
-    // Employee count filter
+    // Employee count
     const minEmployees = parseInt(minEmployeesInput.value) || 0;
     const maxEmployees = parseInt(maxEmployeesInput.value) || Number.MAX_SAFE_INTEGER;
     data = data.filter(item => {
@@ -336,7 +354,7 @@ function applyAllFilters() {
         return empCount >= minEmployees && empCount <= maxEmployees;
     });
 
-    // Location filter
+    // Location
     const selectedCities = getSelectedOptions(locationFilter);
     if (selectedCities.length > 0) {
         data = data.filter(item => {
@@ -363,12 +381,11 @@ function applyAllFilters() {
 
     renderTable();
 }
-
 function getSelectedOptions(selectElement) {
     return Array.from(selectElement.selectedOptions).map(option => option.value);
 }
 
-// ====== SORTING AND CLEARING ======
+// ======= SORTING & CLEAR =======
 function clearAllFilters() {
     revenueFilter.selectedIndex = -1;
     locationFilter.selectedIndex = -1;
@@ -381,7 +398,6 @@ function clearAllFilters() {
     filteredData = [...zoomInfoData];
     renderTable();
 }
-
 function sortTable(column) {
     if (currentSortColumn === column) {
         currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
@@ -393,7 +409,6 @@ function sortTable(column) {
     renderTable();
     updateSortIndicators();
 }
-
 function applySorting() {
     filteredData.sort((a, b) => {
         let aVal, bVal;
@@ -416,7 +431,6 @@ function applySorting() {
         return 0;
     });
 }
-
 function updateSortIndicators() {
     document.querySelectorAll('.sort-indicator').forEach(indicator => {
         indicator.className = 'sort-indicator';
@@ -429,11 +443,10 @@ function updateSortIndicators() {
     }
 }
 
-// ====== TABLE RENDERING ======
+// ======= TABLE =======
 function renderTable() {
     if (!resultsBody) return;
     resultsBody.innerHTML = '';
-
     if (filteredData.length === 0) {
         resultsBody.innerHTML = `<tr>
             <td colspan="13" class="no-results">
@@ -449,7 +462,6 @@ function renderTable() {
         const row = document.createElement('tr');
         const website = item.Website.startsWith('http') ? item.Website : `https://${item.Website}`;
         const linkedinURL = item.LinkedinURL || '#';
-
         row.innerHTML = `
             <td><strong>${escapeHtml(item['Company Name'])}</strong></td>
             <td>${escapeHtml(item['Who it is assigned to'] || 'Unassigned')}</td>
@@ -467,13 +479,11 @@ function renderTable() {
         `;
         resultsBody.appendChild(row);
     });
-
     updateResultsCount(filteredData.length);
     highlightSearchTerms();
 }
-
 function getScoreStyle(score) {
-    // Pastel, high-contrast, and readable background for score
+    // Soft pastel readable badge
     let normalized = Math.max(0, Math.min(100, score)) / 100;
     let hue = 0 + 120 * normalized;
     let saturation = 38;
@@ -481,7 +491,6 @@ function getScoreStyle(score) {
     let textColor = '#1a1a1a';
     return `background-color: hsl(${hue},${saturation}%,${lightness}%); color: ${textColor}; font-weight: bold; font-size: 1.05em; padding: 6px 10px; border-radius: 6px; min-width: 38px; display: inline-block; text-align: center; letter-spacing: 0.5px;`;
 }
-
 function getRevenueClass(revenue) {
     if (revenue.includes('bil.') || revenue.includes('$500 mil. - $1 bil.') || revenue.includes('$250 mil. - $500 mil.') || revenue.includes('$100 mil. - $250 mil.')) {
         return 'revenue-high';
@@ -490,8 +499,7 @@ function getRevenueClass(revenue) {
     }
     return 'revenue-low';
 }
-
-// ====== CSV EXPORT, COUNTERS, ETC. ======
+// ======= CSV EXPORT, COUNTERS, ETC. =======
 function exportToCSV() {
     if (filteredData.length === 0) {
         alert('No data to export. Please adjust your filters.');
@@ -518,7 +526,6 @@ function exportToCSV() {
     link.click();
     document.body.removeChild(link);
 }
-
 function getCSVValue(item, key) {
     switch (key) {
         case 'Company Name': return item['Company Name'];
@@ -537,7 +544,6 @@ function getCSVValue(item, key) {
         default: return '';
     }
 }
-
 function updateResultsCount(count) {
     if (resultsCount) {
         const total = zoomInfoData.length;
@@ -545,6 +551,7 @@ function updateResultsCount(count) {
     }
 }
 
+// ======= UTILS & UI HELPERS =======
 function highlightSearchTerms() {
     const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
     if (!searchTerm) return;
@@ -559,50 +566,30 @@ function highlightSearchTerms() {
         }
     });
 }
-
 function escapeHtml(text) {
     const map = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;'
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
     };
     return String(text).replace(/[&<>"']/g, m => map[m]);
 }
 function escapeRegex(string) {
     return String(string).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
-
-// ====== GENERAL UI ======
 function showLoading() {
     if (loadingIndicator) loadingIndicator.classList.remove('hidden');
 }
 function hideLoading() {
     if (loadingIndicator) loadingIndicator.classList.add('hidden');
 }
-
-// ====== INIT HOOKS AND WIRING ======
-document.addEventListener('DOMContentLoaded', function () {
-    // Assign DOM
-    revenueFilter = document.getElementById('revenueFilter');
-    minEmployeesInput = document.getElementById('minEmployees');
-    maxEmployeesInput = document.getElementById('maxEmployees');
-    locationFilter = document.getElementById('locationFilter');
-    searchInput = document.getElementById('searchInput');
-    resultsBody = document.getElementById('resultsBody');
-    resultsCount = document.getElementById('resultsCount');
-    clearFiltersBtn = document.getElementById('clearFilters');
-    exportDataBtn = document.getElementById('exportData');
-    loadingIndicator = document.getElementById('loadingIndicator');
-
-    populateLocationFilter();
-    attachEventListeners();
-
-    filteredData = [...zoomInfoData];
-    renderTable();
-});
-
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => { clearTimeout(timeout); func(...args); };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+// ======= EVENT WIRING =======
 function attachEventListeners() {
     revenueFilter.addEventListener('change', handleFilterChange);
     locationFilter.addEventListener('change', handleFilterChange);
@@ -615,7 +602,6 @@ function attachEventListeners() {
         header.addEventListener('click', () => sortTable(header.dataset.sort));
     });
 }
-
 function populateLocationFilter() {
     const uniqueCities = [
         ...new Set(
@@ -627,29 +613,15 @@ function populateLocationFilter() {
                 .filter(city => city)
         )
     ].sort();
-
     locationFilter.innerHTML = '';
     const defaultOption = document.createElement('option');
     defaultOption.value = '';
     defaultOption.textContent = 'All Locations';
     locationFilter.appendChild(defaultOption);
-
     uniqueCities.forEach(city => {
         const option = document.createElement('option');
         option.value = city;
         option.textContent = city;
         locationFilter.appendChild(option);
     });
-}
-
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
 }
