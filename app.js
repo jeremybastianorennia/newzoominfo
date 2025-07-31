@@ -301,20 +301,18 @@ const zoomInfoData = [
     "Segmentation": "SMB"
   }
 ];
-
 let filteredData = [...zoomInfoData];
 let currentSortColumn = null;
 let currentSortDirection = 'asc';
 
-// DOM elements - declared globally for access
+// DOM elements
 let revenueFilter, minEmployeesInput, maxEmployeesInput, locationFilter, 
     searchInput, resultsBody, resultsCount, clearFiltersBtn, exportDataBtn, loadingIndicator;
 
 // Initialize the application
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     console.log('App starting, data length:', zoomInfoData.length);
-    
-    // Initialize DOM elements
+
     revenueFilter = document.getElementById('revenueFilter');
     minEmployeesInput = document.getElementById('minEmployees');
     maxEmployeesInput = document.getElementById('maxEmployees');
@@ -326,25 +324,22 @@ document.addEventListener('DOMContentLoaded', function() {
     exportDataBtn = document.getElementById('exportData');
     loadingIndicator = document.getElementById('loadingIndicator');
 
-    // Setup the application
     populateLocationFilter();
     attachEventListeners();
-    
-    // Initialize with all data visible
+
     filteredData = [...zoomInfoData];
-    console.log('Filtered data length:', filteredData.length);
-    ();
+    renderTable();
 });
 
-// Populate location filter with unique cities
+// Populate location filter
 function populateLocationFilter() {
     const uniqueCities = [...new Set(zoomInfoData.map(item => {
         const headOffice = item['Head Office'] || '';
         return headOffice.split(',')[0].trim();
     }))].filter(city => city).sort();
-    
+
     locationFilter.innerHTML = '';
-    
+
     uniqueCities.forEach(city => {
         const option = document.createElement('option');
         option.value = city;
@@ -353,7 +348,7 @@ function populateLocationFilter() {
     });
 }
 
-// Attach all event listeners
+// Attach event listeners
 function attachEventListeners() {
     revenueFilter.addEventListener('change', handleFilterChange);
     locationFilter.addEventListener('change', handleFilterChange);
@@ -362,44 +357,36 @@ function attachEventListeners() {
     searchInput.addEventListener('input', debounce(handleFilterChange, 300));
     clearFiltersBtn.addEventListener('click', clearAllFilters);
     exportDataBtn.addEventListener('click', exportToCSV);
-    
-    // Table sorting
+
     document.querySelectorAll('[data-sort]').forEach(header => {
         header.addEventListener('click', () => sortTable(header.dataset.sort));
     });
 }
 
-// Handle filter changes
 function handleFilterChange() {
     showLoading();
-    
     setTimeout(() => {
         applyAllFilters();
-        ();
         hideLoading();
     }, 50);
 }
 
-// Apply all active filters to the data - FIXED VERSION
 function applyAllFilters() {
     let data = [...zoomInfoData];
 
-    // Revenue filter
     const selectedRevenues = getSelectedOptions(revenueFilter);
     if (selectedRevenues.length > 0) {
         data = data.filter(item => selectedRevenues.includes(item['Revenue Estimate']));
     }
 
-    // Employee count filter
     const minEmployees = parseInt(minEmployeesInput.value) || 0;
     const maxEmployees = parseInt(maxEmployeesInput.value) || Number.MAX_SAFE_INTEGER;
-    
+
     data = data.filter(item => {
         const empCount = item['# of Employees'];
         return empCount >= minEmployees && empCount <= maxEmployees;
     });
 
-    // Location filter
     const selectedCities = getSelectedOptions(locationFilter);
     if (selectedCities.length > 0) {
         data = data.filter(item => {
@@ -408,11 +395,10 @@ function applyAllFilters() {
         });
     }
 
-    // Search filter
     const searchTerm = searchInput.value.trim().toLowerCase();
     if (searchTerm) {
         data = data.filter(item => {
-            return Object.values(item).some(value => 
+            return Object.values(item).some(value =>
                 String(value).toLowerCase().includes(searchTerm)
             );
         });
@@ -423,30 +409,29 @@ function applyAllFilters() {
     if (currentSortColumn) {
         applySorting();
     }
+
+    renderTable();
 }
 
-// Get selected options from a multi-select element
 function getSelectedOptions(selectElement) {
     return Array.from(selectElement.selectedOptions).map(option => option.value);
 }
 
-// Clear all filters and reset to initial state
 function clearAllFilters() {
     revenueFilter.selectedIndex = -1;
     locationFilter.selectedIndex = -1;
     minEmployeesInput.value = '';
     maxEmployeesInput.value = '';
     searchInput.value = '';
-    
+
     currentSortColumn = null;
     currentSortDirection = 'asc';
     updateSortIndicators();
-    
+
     filteredData = [...zoomInfoData];
     renderTable();
 }
 
-// Sort table by specified column
 function sortTable(column) {
     if (currentSortColumn === column) {
         currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
@@ -460,12 +445,10 @@ function sortTable(column) {
     updateSortIndicators();
 }
 
-// Apply current sorting to filtered data - FIXED VERSION
 function applySorting() {
     filteredData.sort((a, b) => {
         let aVal, bVal;
 
-        // Handle special field mappings
         if (currentSortColumn === '# of Employees') {
             aVal = Number(a['# of Employees']);
             bVal = Number(b['# of Employees']);
@@ -477,7 +460,6 @@ function applySorting() {
             bVal = b[currentSortColumn];
         }
 
-        // String comparison
         if (typeof aVal === 'string' && typeof bVal === 'string') {
             aVal = aVal.toLowerCase();
             bVal = bVal.toLowerCase();
@@ -489,7 +471,6 @@ function applySorting() {
     });
 }
 
-// Update visual sort indicators
 function updateSortIndicators() {
     document.querySelectorAll('.sort-indicator').forEach(indicator => {
         indicator.className = 'sort-indicator';
@@ -505,12 +486,12 @@ function updateSortIndicators() {
 
 function renderTable() {
     console.log('renderTable called, filteredData length:', filteredData.length);
-    
+
     if (!resultsBody) {
         console.log('resultsBody not found!');
         return;
     }
-    
+
     resultsBody.innerHTML = '';
 
     if (filteredData.length === 0) {
@@ -530,7 +511,7 @@ function renderTable() {
         const row = document.createElement('tr');
         const website = item.Website.startsWith('http') ? item.Website : `https://${item.Website}`;
         const linkedinURL = item.LinkedinURL || '#';
-        
+
         row.innerHTML = `
             <td><strong>${escapeHtml(item['Company Name'])}</strong></td>
             <td>${escapeHtml(item['Who it is assigned to'] || 'Unassigned')}</td>
@@ -553,8 +534,6 @@ function renderTable() {
     highlightSearchTerms();
 }
 
-
-// Export current filtered data to CSV
 function exportToCSV() {
     if (filteredData.length === 0) {
         alert('No data to export. Please adjust your filters.');
@@ -562,34 +541,22 @@ function exportToCSV() {
     }
 
     const headers = [
-        'Company Name', 'Assigned To', 'Account Type', 'Prospect Score', 'Account Notes', 
-        'Drop Notes', 'Website', 'LinkedIn URL', 'Revenue Estimate', 'Employees', 
+        'Company Name', 'Assigned To', 'Account Type', 'Prospect Score', 'Account Notes',
+        'Drop Notes', 'Website', 'LinkedIn URL', 'Revenue Estimate', 'Employees',
         'Head Office', 'Country', 'Segmentation'
     ];
 
     const csvRows = [
         headers.join(','),
-        ...filteredData.map(item => [
-            `"${item['Company Name']}"`,
-            `"${item['Who it is assigned to']}"`,
-            `"${item['Account Type']}"`,
-            item['Prospect Score'],
-            `"${item['Account Notes']}"`,
-            `"${item['Drop Notes']}"`,
-            `"${item.Website}"`,
-            `"${item.LinkedinURL}"`,
-            `"${item['Revenue Estimate']}"`,
-            item['# of Employees'],
-            `"${item['Head Office']}"`,
-            `"${item.Country}"`,
-            `"${item.Segmentation}"`
-        ].join(','))
+        ...filteredData.map(item => headers.map(header => {
+            const field = getCSVValue(item, header);
+            return `"${field.replace(/"/g, '""')}"`;
+        }).join(','))
     ];
 
     const csvContent = csvRows.join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
-    
     link.href = URL.createObjectURL(blob);
     link.download = `zoominfo_accounts_${new Date().toISOString().split('T')[0]}.csv`;
     document.body.appendChild(link);
@@ -597,7 +564,25 @@ function exportToCSV() {
     document.body.removeChild(link);
 }
 
-// Update the results count display
+function getCSVValue(item, key) {
+    switch (key) {
+        case 'Company Name': return item['Company Name'];
+        case 'Assigned To': return item['Who it is assigned to'];
+        case 'Account Type': return item['Account Type'];
+        case 'Prospect Score': return String(item['Prospect Score']);
+        case 'Account Notes': return item['Account Notes'];
+        case 'Drop Notes': return item['Drop Notes'];
+        case 'Website': return item.Website;
+        case 'LinkedIn URL': return item.LinkedinURL;
+        case 'Revenue Estimate': return item['Revenue Estimate'];
+        case 'Employees': return String(item['# of Employees']);
+        case 'Head Office': return item['Head Office'];
+        case 'Country': return item.Country;
+        case 'Segmentation': return item.Segmentation;
+        default: return '';
+    }
+}
+
 function updateResultsCount(count) {
     if (resultsCount) {
         const total = zoomInfoData.length;
@@ -605,23 +590,20 @@ function updateResultsCount(count) {
     }
 }
 
-// Show loading indicator
 function showLoading() {
     if (loadingIndicator) {
         loadingIndicator.classList.remove('hidden');
     }
 }
 
-// Hide loading indicator
 function hideLoading() {
     if (loadingIndicator) {
         loadingIndicator.classList.add('hidden');
     }
 }
 
-// Get CSS class for revenue styling
 function getRevenueClass(revenue) {
-    if (revenue.includes('bil.') || revenue.includes('$500 mil. - $1 bil.') || 
+    if (revenue.includes('bil.') || revenue.includes('$500 mil. - $1 bil.') ||
         revenue.includes('$250 mil. - $500 mil.') || revenue.includes('$100 mil. - $250 mil.')) {
         return 'revenue-high';
     } else if (revenue.includes('$50 mil.') || revenue.includes('$25 mil.')) {
@@ -629,56 +611,42 @@ function getRevenueClass(revenue) {
     }
     return 'revenue-low';
 }
-// Dynamic color gradient for prospect score: red → yellow → green
+
 function getScoreStyle(score) {
-    // Ensure the score is between 0 and 100
     let normalized = Math.max(0, Math.min(100, score)) / 100;
     let r, g, b;
 
     if (normalized < 0.5) {
-        // Red to Yellow (0-50 range)
         r = 255;
-        g = Math.round(510 * normalized); // 0 to 255 as score goes 0-50
+        g = Math.round(510 * normalized);
         b = 0;
     } else {
-        // Yellow to Green (50-100 range)
-        r = Math.round(510 * (1 - normalized)); // 255 to 0 as score goes 50-100
+        r = Math.round(510 * (1 - normalized));
         g = 255;
         b = 0;
     }
 
-    // Choose white text for dark bg, black for bright bg
     let textColor = (g < 180 && r > 160) ? 'black' : 'white';
 
-    // Return the CSS style string
     return `background-color: rgb(${r}, ${g}, ${b}); color: ${textColor}; font-weight: 600; padding: 4px 8px; border-radius: 6px; min-width: 30px; display: inline-block; text-align: center;`;
 }
 
-
-// Get CSS class for prospect score styling
-function getScoreClass(score) {
-    if (score >= 80) return 'revenue-high';
-    else if (score >= 60) return 'revenue-medium';
-    return 'revenue-low';
-}
-
-// Highlight search terms in the table
 function highlightSearchTerms() {
     const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
     if (!searchTerm) return;
 
     const regex = new RegExp(escapeRegex(searchTerm), 'gi');
     resultsBody.querySelectorAll('td').forEach(cell => {
+        if (cell.querySelector('a')) return; // Don't break links
         const text = cell.textContent;
         if (regex.test(text)) {
-            cell.innerHTML = text.replace(regex, match => 
+            cell.innerHTML = text.replace(regex, match =>
                 `<span class="search-highlight">${match}</span>`
             );
         }
     });
 }
 
-// Utility functions
 function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
