@@ -553,6 +553,7 @@ function renderTable() {
     highlightSearchTerms();
 }
 
+
     filteredData.forEach(item => {
         const row = document.createElement('tr');
         const website = item.Website.startsWith('http') ? item.Website : `https://${item.Website}`;
