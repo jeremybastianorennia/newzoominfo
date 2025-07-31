@@ -301,412 +301,75 @@ const zoomInfoData = [
     "Segmentation": "SMB"
   }
 ];
-// ====== DATA ========
-const zoomInfoData = [
-  // ... (use your current data array here, as you posted; trimmed for brevity)
-];
+function createTable(data) {
+  const table = document.getElementById("accountTable");
+  table.innerHTML = ""; // Clear previous content
 
-// ====== GLOBALS ======
-let filteredData = [...zoomInfoData];
-let currentSortColumn = null;
-let currentSortDirection = 'asc';
+  // Table header
+  const tableHead = document.createElement("thead");
+  const tableHeaderRow = document.createElement("tr");
+  ["Company Name", "Assigned To", "Type", "Score", "Account Notes", "Drop Notes", "Website", "LinkedIn"].forEach(header => {
+    const th = document.createElement("th");
+    th.textContent = header;
+    tableHeaderRow.appendChild(th);
+  });
+  tableHead.appendChild(tableHeaderRow);
+  table.appendChild(tableHead);
 
-let revenueFilter, minEmployeesInput, maxEmployeesInput, locationFilter,
-    searchInput, resultsBody, resultsCount, clearFiltersBtn, exportDataBtn, loadingIndicator;
-let prospectScoreSlider, scoreMinValue, scoreMaxValue;
+  // Table body
+  const tableBody = document.createElement("tbody");
 
-// ====== FILTER FUNCTIONS ======
-function handleFilterChange() {
-    showLoading();
-    setTimeout(() => {
-        applyAllFilters();
-        hideLoading();
-    }, 50);
+  data.forEach(account => {
+    const row = document.createElement("tr");
+
+    const nameCell = document.createElement("td");
+    nameCell.textContent = account["Company Name"] || "";
+    row.appendChild(nameCell);
+
+    const assignedCell = document.createElement("td");
+    assignedCell.textContent = account["Who it is assigned to"] || "";
+    row.appendChild(assignedCell);
+
+    const typeCell = document.createElement("td");
+    typeCell.textContent = account["Account Type"] || "";
+    row.appendChild(typeCell);
+
+    const scoreCell = document.createElement("td");
+    scoreCell.textContent = account["Prospect Score"] ?? "";
+    row.appendChild(scoreCell);
+
+    const notesCell = document.createElement("td");
+    notesCell.textContent = account["Account Notes"] || "";
+    row.appendChild(notesCell);
+
+    const dropCell = document.createElement("td");
+    dropCell.textContent = account["Drop Notes"] || "";
+    row.appendChild(dropCell);
+
+    const websiteCell = document.createElement("td");
+    const websiteLink = document.createElement("a");
+    websiteLink.href = account["Website"] || "#";
+    websiteLink.textContent = "Website";
+    websiteLink.target = "_blank";
+    websiteCell.appendChild(websiteLink);
+    row.appendChild(websiteCell);
+
+    const linkedinCell = document.createElement("td");
+    const linkedinLink = document.createElement("a");
+    linkedinLink.href = account["LinkedinURL"] || "#";
+    linkedinLink.textContent = "LinkedIn";
+    linkedinLink.target = "_blank";
+    linkedinCell.appendChild(linkedinLink);
+    row.appendChild(linkedinCell);
+
+    tableBody.appendChild(row);
+  });
+
+  table.appendChild(tableBody);
 }
 
-function applyAllFilters() {
-    let data = [...zoomInfoData];
+document.addEventListener("DOMContentLoaded", () => {
+  createTable(zoomInfoData);
 
-    // Revenue filter
-    const selectedRevenues = getSelectedOptions(revenueFilter);
-    if (selectedRevenues.length > 0) {
-        data = data.filter(item => selectedRevenues.includes(item['Revenue Estimate']));
-    }
-
-    // Employee count filter
-    const minEmployees = parseInt(minEmployeesInput.value) || 0;
-    const maxEmployees = parseInt(maxEmployeesInput.value) || Number.MAX_SAFE_INTEGER;
-    data = data.filter(item => {
-        const empCount = item['# of Employees'];
-        return empCount >= minEmployees && empCount <= maxEmployees;
-    });
-
-    // Location filter
-    const selectedCities = getSelectedOptions(locationFilter);
-    if (selectedCities.length > 0) {
-        data = data.filter(item => {
-            const city = item['Head Office'].split(',')[0].trim();
-            return selectedCities.includes(city);
-        });
-    }
-
-    // Prospect Score Range — get from noUiSlider
-    let scoreMin = 0, scoreMax = 100;
-    if (prospectScoreSlider && prospectScoreSlider.noUiSlider) {
-        [scoreMin, scoreMax] = prospectScoreSlider.noUiSlider.get().map(Number);
-    }
-    data = data.filter(item => {
-        const ps = Number(item["Prospect Score"]);
-        return ps >= scoreMin && ps <= scoreMax;
-    });
-
-    // Search filter
-    const searchTerm = searchInput.value.trim().toLowerCase();
-    if (searchTerm) {
-        data = data.filter(item => {
-            return Object.values(item).some(value =>
-                String(value).toLowerCase().includes(searchTerm)
-            );
-        });
-    }
-
-    filteredData = data;
-
-    if (currentSortColumn) {
-        applySorting();
-    }
-
-    renderTable();
-}
-
-function getSelectedOptions(selectElement) {
-    return Array.from(selectElement.selectedOptions).map(option => option.value);
-}
-
-// ====== SORTING AND CLEARING ======
-function clearAllFilters() {
-    revenueFilter.selectedIndex = -1;
-    locationFilter.selectedIndex = -1;
-    minEmployeesInput.value = '';
-    maxEmployeesInput.value = '';
-    searchInput.value = '';
-    if (prospectScoreSlider && prospectScoreSlider.noUiSlider) {
-        prospectScoreSlider.noUiSlider.set([0, 100]);
-        scoreMinValue.textContent = 0;
-        scoreMaxValue.textContent = 100;
-    }
-    currentSortColumn = null;
-    currentSortDirection = 'asc';
-    updateSortIndicators();
-    filteredData = [...zoomInfoData];
-    renderTable();
-}
-
-function sortTable(column) {
-    if (currentSortColumn === column) {
-        currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
-    } else {
-        currentSortColumn = column;
-        currentSortDirection = 'asc';
-    }
-    applySorting();
-    renderTable();
-    updateSortIndicators();
-}
-
-function applySorting() {
-    filteredData.sort((a, b) => {
-        let aVal, bVal;
-        if (currentSortColumn === '# of Employees') {
-            aVal = Number(a['# of Employees']);
-            bVal = Number(b['# of Employees']);
-        } else if (currentSortColumn === 'Prospect Score') {
-            aVal = Number(a['Prospect Score']);
-            bVal = Number(b['Prospect Score']);
-        } else {
-            aVal = a[currentSortColumn];
-            bVal = b[currentSortColumn];
-        }
-
-        if (typeof aVal === 'string' && typeof bVal === 'string') {
-            aVal = aVal.toLowerCase();
-            bVal = bVal.toLowerCase();
-        }
-
-        if (aVal < bVal) return currentSortDirection === 'asc' ? -1 : 1;
-        if (aVal > bVal) return currentSortDirection === 'asc' ? 1 : -1;
-        return 0;
-    });
-}
-
-function updateSortIndicators() {
-    document.querySelectorAll('.sort-indicator').forEach(indicator => {
-        indicator.className = 'sort-indicator';
-    });
-    if (currentSortColumn) {
-        const indicator = document.querySelector(`[data-sort="${currentSortColumn}"] .sort-indicator`);
-        if (indicator) {
-            indicator.classList.add(currentSortDirection);
-        }
-    }
-}
-
-// ====== TABLE RENDERING ======
-function renderTable() {
-    if (!resultsBody) return;
-    resultsBody.innerHTML = '';
-
-    if (filteredData.length === 0) {
-        resultsBody.innerHTML = `<tr>
-            <td colspan="13" class="no-results">
-                <h3>No accounts found</h3>
-                <p>Try adjusting your filters to see more results.</p>
-            </td>
-        </tr>`;
-        updateResultsCount(0);
-        return;
-    }
-
-    filteredData.forEach(item => {
-        const row = document.createElement('tr');
-        const website = item.Website.startsWith('http') ? item.Website : `https://${item.Website}`;
-        const linkedinURL = item.LinkedinURL || '#';
-
-        row.innerHTML = `
-            <td><strong>${escapeHtml(item['Company Name'])}</strong></td>
-            <td>${escapeHtml(item['Who it is assigned to'] || 'Unassigned')}</td>
-            <td><span class="status status--info">${escapeHtml(item['Account Type'] || 'N/A')}</span></td>
-            <td><span style="${getScoreStyle(item['Prospect Score'])}">${item['Prospect Score'] || 'N/A'}</span></td>
-            <td>${escapeHtml(item['Account Notes'] || '')}</td>
-            <td>${escapeHtml(item['Drop Notes'] || '')}</td>
-            <td><a href="${website}" target="_blank">${escapeHtml(item.Website)}</a></td>
-            <td>${item.LinkedinURL ? `<a href="${linkedinURL}" target="_blank">LinkedIn</a>` : 'N/A'}</td>
-            <td><span class="${getRevenueClass(item['Revenue Estimate'])}">${escapeHtml(item['Revenue Estimate'])}</span></td>
-            <td>${item['# of Employees'].toLocaleString()}</td>
-            <td>${escapeHtml(item['Head Office'])}</td>
-            <td>${escapeHtml(item.Country)}</td>
-            <td><span class="status status--success">${escapeHtml(item.Segmentation || 'N/A')}</span></td>
-        `;
-        resultsBody.appendChild(row);
-    });
-
-    updateResultsCount(filteredData.length);
-    highlightSearchTerms();
-}
-
-function getScoreStyle(score) {
-    // Pastel, high-contrast and readable!
-    let normalized = Math.max(0, Math.min(100, score)) / 100;
-    let hue = 0 + 120 * normalized;
-    let saturation = 38;
-    let lightness = 91;
-    let textColor = '#1a1a1a';
-    return `background-color: hsl(${hue},${saturation}%,${lightness}%); color: ${textColor}; font-weight: bold; font-size: 1.05em; padding: 6px 10px; border-radius: 6px; min-width: 38px; display: inline-block; text-align: center; letter-spacing: 0.5px;`;
-}
-
-function getRevenueClass(revenue) {
-    if (revenue.includes('bil.') || revenue.includes('$500 mil. - $1 bil.') || revenue.includes('$250 mil. - $500 mil.') || revenue.includes('$100 mil. - $250 mil.')) {
-        return 'revenue-high';
-    } else if (revenue.includes('$50 mil.') || revenue.includes('$25 mil.')) {
-        return 'revenue-medium';
-    }
-    return 'revenue-low';
-}
-
-// ====== CSV EXPORT, COUNTERS, ETC. ======
-function exportToCSV() {
-    if (filteredData.length === 0) {
-        alert('No data to export. Please adjust your filters.');
-        return;
-    }
-    const headers = [
-        'Company Name', 'Assigned To', 'Account Type', 'Prospect Score', 'Account Notes',
-        'Drop Notes', 'Website', 'LinkedIn URL', 'Revenue Estimate', 'Employees',
-        'Head Office', 'Country', 'Segmentation'
-    ];
-    const csvRows = [
-        headers.join(','),
-        ...filteredData.map(item => headers.map(header => {
-            const field = getCSVValue(item, header);
-            return `"${field.replace(/"/g, '""')}"`;
-        }).join(','))
-    ];
-    const csvContent = csvRows.join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `zoominfo_accounts_${new Date().toISOString().split('T')[0]}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-
-function getCSVValue(item, key) {
-    switch (key) {
-        case 'Company Name': return item['Company Name'];
-        case 'Assigned To': return item['Who it is assigned to'];
-        case 'Account Type': return item['Account Type'];
-        case 'Prospect Score': return String(item['Prospect Score']);
-        case 'Account Notes': return item['Account Notes'];
-        case 'Drop Notes': return item['Drop Notes'];
-        case 'Website': return item.Website;
-        case 'LinkedIn URL': return item.LinkedinURL;
-        case 'Revenue Estimate': return item['Revenue Estimate'];
-        case 'Employees': return String(item['# of Employees']);
-        case 'Head Office': return item['Head Office'];
-        case 'Country': return item.Country;
-        case 'Segmentation': return item.Segmentation;
-        default: return '';
-    }
-}
-
-function updateResultsCount(count) {
-    if (resultsCount) {
-        const total = zoomInfoData.length;
-        resultsCount.textContent = `${count.toLocaleString()} of ${total.toLocaleString()} accounts found`;
-    }
-}
-
-function highlightSearchTerms() {
-    const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
-    if (!searchTerm) return;
-    const regex = new RegExp(escapeRegex(searchTerm), 'gi');
-    resultsBody.querySelectorAll('td').forEach(cell => {
-        if (cell.querySelector('a')) return; // Don't break links
-        const text = cell.textContent;
-        if (regex.test(text)) {
-            cell.innerHTML = text.replace(regex, match =>
-                `<span class="search-highlight">${match}</span>`
-            );
-        }
-    });
-}
-
-function escapeHtml(text) {
-    const map = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;'
-    };
-    return String(text).replace(/[&<>"']/g, m => map[m]);
-}
-function escapeRegex(string) {
-    return String(string).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-// ====== GENERAL UI ======
-function showLoading() {
-    if (loadingIndicator) {
-        loadingIndicator.classList.remove('hidden');
-    }
-}
-function hideLoading() {
-    if (loadingIndicator) {
-        loadingIndicator.classList.add('hidden');
-    }
-}
-
-// ====== INIT HOOKS AND WIRING ======
-document.addEventListener('DOMContentLoaded', function () {
-    // Assign DOM
-    revenueFilter = document.getElementById('revenueFilter');
-    minEmployeesInput = document.getElementById('minEmployees');
-    maxEmployeesInput = document.getElementById('maxEmployees');
-    locationFilter = document.getElementById('locationFilter');
-    searchInput = document.getElementById('searchInput');
-    resultsBody = document.getElementById('resultsBody');
-    resultsCount = document.getElementById('resultsCount');
-    clearFiltersBtn = document.getElementById('clearFilters');
-    exportDataBtn = document.getElementById('exportData');
-    loadingIndicator = document.getElementById('loadingIndicator');
-    scoreMinValue = document.getElementById('scoreMinValue');
-    scoreMaxValue = document.getElementById('scoreMaxValue');
-    prospectScoreSlider = document.getElementById('prospectScoreSlider');
-
-    populateLocationFilter();
-    attachEventListeners();
-
-    // ====== SLIDER INIT ======
-    if (prospectScoreSlider && typeof noUiSlider !== 'undefined') {
-        noUiSlider.create(prospectScoreSlider, {
-            start: [0, 100],
-            connect: true,
-            step: 1,
-            range: { min: 0, max: 100 },
-            tooltips: true,
-            format: {
-                to: value => Math.round(value),
-                from: value => Number(value)
-            }
-        });
-        prospectScoreSlider.noUiSlider.on('update', function(values) {
-            let min = Math.round(values[0]);
-            let max = Math.round(values[1]);
-            scoreMinValue.textContent = min;
-            scoreMaxValue.textContent = max;
-            handleFilterChange();
-        });
-    } else {
-        console.error('prospectScoreSlider or noUiSlider not defined!');
-    }
-
-    filteredData = [...zoomInfoData];
-    renderTable();
+  // Add other event listeners here if needed, like filters or search
 });
-
-// ====== EVENT WIRING ======
-function attachEventListeners() {
-    revenueFilter.addEventListener('change', handleFilterChange);
-    locationFilter.addEventListener('change', handleFilterChange);
-    minEmployeesInput.addEventListener('input', debounce(handleFilterChange, 300));
-    maxEmployeesInput.addEventListener('input', debounce(handleFilterChange, 300));
-    searchInput.addEventListener('input', debounce(handleFilterChange, 300));
-    clearFiltersBtn.addEventListener('click', clearAllFilters);
-    exportDataBtn.addEventListener('click', exportToCSV);
-    document.querySelectorAll('[data-sort]').forEach(header => {
-        header.addEventListener('click', () => sortTable(header.dataset.sort));
-    });
-}
-
-// ====== LOCATION POPULATION ======
-function populateLocationFilter() {
-    const uniqueCities = [
-        ...new Set(
-            zoomInfoData
-                .map(item => {
-                    const headOffice = item['Head Office'] || '';
-                    return headOffice.split(',')[0].trim();
-                })
-                .filter(city => city)
-        )
-    ].sort();
-
-    locationFilter.innerHTML = '';
-
-    const defaultOption = document.createElement('option');
-    defaultOption.value = '';
-    defaultOption.textContent = 'All Locations';
-    locationFilter.appendChild(defaultOption);
-
-    uniqueCities.forEach(city => {
-        const option = document.createElement('option');
-        option.value = city;
-        option.textContent = city;
-        locationFilter.appendChild(option);
-    });
-}
-
-// ====== DEBOUNCE UTILITY ======
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
