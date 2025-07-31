@@ -91,6 +91,27 @@ document.addEventListener('DOMContentLoaded', function() {
                         </select>
                     </div>
                 </div>
+<!-- Add this inside .filters-grid wherever filters are, before Actions card -->
+<div class="card filter-card">
+  <h3>Prospect Score Range</h3>
+  <div class="form-group" style="padding:8px 0;">
+    <input 
+      type="range" 
+      id="prospectScoreMin" 
+      min="0" max="100" step="1" 
+      value="0" 
+      style="width: 38%; display:inline;">
+    <span id="scoreMinValue" style="margin: 0 8px;">0</span>
+    <span style="font-weight: bold;">–</span>
+    <span id="scoreMaxValue" style="margin: 0 8px;">100</span>
+    <input 
+      type="range" 
+      id="prospectScoreMax" 
+      min="0" max="100" step="1" 
+      value="100" 
+      style="width: 38%; display:inline;">
+  </div>
+</div>
 
                 <!-- Action Buttons -->
                 <div class="card filter-card">
