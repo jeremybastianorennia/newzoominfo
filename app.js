@@ -634,7 +634,7 @@ function getScoreStyle(score) {
     // Ensure the score is between 0 and 100
     let normalized = Math.max(0, Math.min(100, score)) / 100;
     let r, g, b;
-    
+
     if (normalized < 0.5) {
         // Red to Yellow (0-50 range)
         r = 255;
@@ -646,11 +646,11 @@ function getScoreStyle(score) {
         g = 255;
         b = 0;
     }
-    
-    // Choose text color for readability
+
+    // Choose white text for dark bg, black for bright bg
     let textColor = (g < 180 && r > 160) ? 'black' : 'white';
-    
-    // Return inline style string
+
+    // Return the CSS style string
     return `background-color: rgb(${r}, ${g}, ${b}); color: ${textColor}; font-weight: 600; padding: 4px 8px; border-radius: 6px; min-width: 30px; display: inline-block; text-align: center;`;
 }
 
