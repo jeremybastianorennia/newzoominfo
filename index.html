@@ -3,148 +3,1110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TAM Dashboard</title>
+    <title>ZoomInfo Account Filter Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-    <!-- Password protection script in the HEAD is OK for this approach -->
-    <script>
-        const correctPassword = "flames";
-        function checkPassword() {
-            const enteredPassword = prompt("This dashboard is protected. Please enter the password:");
-            if (enteredPassword === correctPassword) {
-                document.body.style.display = 'block';
-                return true;
-            } else if (enteredPassword !== null) {
-                alert("Incorrect password. Please try again.");
-                checkPassword();
-            } else {
-                document.body.style.display = 'none';
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a1c29 0%, #2d3561 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #fff, #a8edea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .filters-section {
+            padding: 30px;
+            background: rgba(248, 250, 252, 0.8);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        select, input {
+            padding: 12px 16px;
+            border: 2px solid rgba(209, 213, 219, 0.5);
+            border-radius: 12px;
+            font-size: 1rem;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        select[multiple] {
+            min-height: 120px;
+        }
+
+        .employee-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(107, 114, 128, 0.1);
+            color: #374151;
+            border: 2px solid rgba(107, 114, 128, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .results-section {
+            padding: 30px;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .results-count {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .search-box {
+            flex-grow: 1;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding-left: 45px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9CA3AF;
+        }
+
+        .table-wrapper {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            border: 1px solid rgba(226, 232, 240, 0.5);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            max-height: 600px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 15px 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+        }
+
+        th {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            font-weight: 600;
+            color: #374151;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.2s ease;
+        }
+
+        th:hover {
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+        }
+
+        .sort-indicator {
+            margin-left: 8px;
+            font-size: 0.8rem;
+            opacity: 0.5;
+        }
+
+        .sort-indicator.asc::after {
+            content: '↑';
+            opacity: 1;
+            color: #667eea;
+        }
+
+        .sort-indicator.desc::after {
+            content: '↓';
+            opacity: 1;
+            color: #667eea;
+        }
+
+        tbody tr:hover {
+            background-color: rgba(102, 126, 234, 0.05);
+        }
+
+        .status {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status--info {
+            background: rgba(59, 130, 246, 0.1);
+            color: #1d4ed8;
+        }
+
+        .status--success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #047857;
+        }
+
+        .revenue-high {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .revenue-medium {
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .revenue-low {
+            background: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .search-highlight {
+            background: rgba(254, 240, 138, 0.8);
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6B7280;
+        }
+
+        .no-results h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #374151;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            font-size: 1.1rem;
+            color: #667eea;
+        }
+
+        .loading::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            margin-left: 10px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .filters-section, .results-section {
+                padding: 20px;
+            }
+
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .results-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                max-width: none;
+            }
+
+            th, td {
+                padding: 10px 8px;
+                font-size: 0.8rem;
             }
         }
-        document.body.style.display = 'none';
-        document.addEventListener('DOMContentLoaded', function() { checkPassword(); });
-    </script>
+    </style>
 </head>
-
 <body>
     <div class="container">
-        <!-- Header -->
-        <header class="header">
+        <div class="header">
             <h1>ZoomInfo Account Filter Dashboard</h1>
-            <p class="subtitle">Filter and analyze enriched ZoomInfo account data to identify and qualify prospects</p>
-        </header>
+            <p>Filter and analyze enriched ZoomInfo account data to identify and qualify prospects</p>
+        </div>
 
-        <!-- Filter Controls -->
-        <section class="filters-section">
+        <div class="filters-section">
             <div class="filters-grid">
-
-                <!-- Revenue Filter -->
-                <div class="card filter-card">
-                    <h3>Revenue Range</h3>
-                    <div class="form-group">
-                        <select id="revenueFilter" class="form-control" multiple size="6">
-                            <option value="Under $500,000">Under $500,000</option>
-                            <option value="$500,000 - $1 mil.">$500,000 - $1 mil.</option>
-                            <option value="$1 mil. - $5 mil.">$1 mil. - $5 mil.</option>
-                            <option value="$5 mil. - $10 mil.">$5 mil. - $10 mil.</option>
-                            <option value="$10 mil. - $25 mil.">$10 mil. - $25 mil.</option>
-                            <option value="$25 mil. - $50 mil.">$25 mil. - $50 mil.</option>
-                            <option value="$50 mil. - $100 mil.">$50 mil. - $100 mil.</option>
-                            <option value="$100 mil. - $250 mil.">$100 mil. - $250 mil.</option>
-                            <option value="$250 mil. - $500 mil.">$250 mil. - $500 mil.</option>
-                            <option value="$500 mil. - $1 bil.">$500 mil. - $1 bil.</option>
-                            <option value="Over $5 bil.">Over $5 bil.</option>
-                        </select>
-                    </div>
+                <div class="filter-group">
+                    <label class="filter-label" for="revenueFilter">Revenue Range</label>
+                    <select id="revenueFilter" multiple>
+                        <option value="Under $500,000">Under $500,000</option>
+                        <option value="$500,000 - $1 mil.">$500,000 - $1 mil.</option>
+                        <option value="$1 mil. - $5 mil.">$1 mil. - $5 mil.</option>
+                        <option value="$5 mil. - $10 mil.">$5 mil. - $10 mil.</option>
+                        <option value="$10 mil. - $25 mil.">$10 mil. - $25 mil.</option>
+                        <option value="$25 mil. - $50 mil.">$25 mil. - $50 mil.</option>
+                        <option value="$50 mil. - $100 mil.">$50 mil. - $100 mil.</option>
+                        <option value="$100 mil. - $250 mil.">$100 mil. - $250 mil.</option>
+                        <option value="$250 mil. - $500 mil.">$250 mil. - $500 mil.</option>
+                        <option value="$500 mil. - $1 bil.">$500 mil. - $1 bil.</option>
+                        <option value="Over $5 bil.">Over $5 bil.</option>
+                    </select>
                 </div>
 
-                <!-- Employee Count Filter -->
-                <div class="card filter-card">
-                    <h3>Employee Count</h3>
+                <div class="filter-group">
+                    <label class="filter-label">Employee Count</label>
                     <div class="employee-inputs">
-                        <div class="form-group">
-                            <label class="form-label" for="minEmployees">Min Employees</label>
-                            <input type="number" id="minEmployees" class="form-control" placeholder="0" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="maxEmployees">Max Employees</label>
-                            <input type="number" id="maxEmployees" class="form-control" placeholder="Unlimited" min="0">
-                        </div>
+                        <input type="number" id="minEmployees" placeholder="Min" min="0">
+                        <input type="number" id="maxEmployees" placeholder="Max" min="0">
                     </div>
                 </div>
 
-                <!-- Location Filter -->
-                <div class="card filter-card">
-                    <h3>Location (City)</h3>
-                    <div class="form-group">
-                        <select id="locationFilter" class="form-control" multiple size="6">
-                            <!-- Options will be populated by JS -->
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Actions -->
-                <div class="card filter-card">
-                    <h3>Actions</h3>
-                    <div class="action-buttons">
-                        <button id="clearFilters" class="btn btn--secondary btn--full-width">Clear Filters</button>
-                        <button id="exportData" class="btn btn--primary btn--full-width">Export Data</button>
-                    </div>
+                <div class="filter-group">
+                    <label class="filter-label" for="locationFilter">Location (City)</label>
+                    <select id="locationFilter" multiple>
+                        <!-- Options will be populated by JavaScript -->
+                    </select>
                 </div>
             </div>
-        </section>
 
-        <!-- Search and Results -->
-        <section class="results-section">
-            <div class="card">
-                <div class="card__header">
-                    <div class="results-header">
-                        <h2>Account Results</h2>
-                        <div class="results-count">
-                            <span id="resultsCount">0 accounts found</span>
-                        </div>
-                    </div>
-                    <div class="search-container">
-                        <input type="text" id="searchInput" class="form-control" placeholder="Search within results...">
-                    </div>
-                </div>
-                <div class="card__body">
-                    <div class="table-container">
-                        <table id="resultsTable" class="results-table">
-                            <thead>
-                                <tr>
-                                    <th data-sort="Company Name">Company Name <span class="sort-indicator"></span></th>
-                                    <th data-sort="Who it is assigned to">Assigned To <span class="sort-indicator"></span></th>
-                                    <th data-sort="Account Type">Account Type <span class="sort-indicator"></span></th>
-                                    <th data-sort="Prospect Score">Prospect Score <span class="sort-indicator"></span></th>
-                                    <th data-sort="Account Notes">Account Notes <span class="sort-indicator"></span></th>
-                                    <th data-sort="Drop Notes">Drop Notes <span class="sort-indicator"></span></th>
-                                    <th data-sort="Website">Website <span class="sort-indicator"></span></th>
-                                    <th data-sort="LinkedinURL">LinkedIn <span class="sort-indicator"></span></th>
-                                    <th data-sort="Revenue Estimate">Revenue <span class="sort-indicator"></span></th>
-                                    <th data-sort="# of Employees">Employees <span class="sort-indicator"></span></th>
-                                    <th data-sort="Head Office">Head Office <span class="sort-indicator"></span></th>
-                                    <th data-sort="Country">Country <span class="sort-indicator"></span></th>
-                                    <th data-sort="Segmentation">Segmentation <span class="sort-indicator"></span></th>
-                                </tr>
-                            </thead>
-                            <tbody id="resultsBody">
-                                <!-- Populated by JS -->
-                            </tbody>
-                        </table>
-                    </div>
+            <div class="actions">
+                <button id="clearFilters" class="btn btn-secondary">Clear Filters</button>
+                <button id="exportData" class="btn btn-primary">Export Data</button>
+            </div>
+        </div>
+
+        <div class="results-section">
+            <div class="results-header">
+                <div id="resultsCount" class="results-count">20 of 20 accounts found</div>
+                <div class="search-box">
+                    <div class="search-icon">🔍</div>
+                    <input type="text" id="searchInput" placeholder="Search within results...">
                 </div>
             </div>
-        </section>
 
-        <!-- Loading Indicator -->
-        <div id="loadingIndicator" class="loading hidden">
-            <div class="loading-spinner"></div>
-            <p>Filtering results...</p>
+            <div id="loadingIndicator" class="loading hidden">Loading results...</div>
+
+            <div class="table-wrapper">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th data-sort="Company Name">Company Name <span class="sort-indicator"></span></th>
+                                <th data-sort="Who it is assigned to">Assigned To <span class="sort-indicator"></span></th>
+                                <th data-sort="Account Type">Account Type <span class="sort-indicator"></span></th>
+                                <th data-sort="Prospect Score">Prospect Score <span class="sort-indicator"></span></th>
+                                <th>Account Notes</th>
+                                <th>Drop Notes</th>
+                                <th>Website</th>
+                                <th>LinkedIn</th>
+                                <th data-sort="Revenue Estimate">Revenue <span class="sort-indicator"></span></th>
+                                <th data-sort="# of Employees">Employees <span class="sort-indicator"></span></th>
+                                <th data-sort="Head Office">Head Office <span class="sort-indicator"></span></th>
+                                <th data-sort="Country">Country <span class="sort-indicator"></span></th>
+                                <th data-sort="Segmentation">Segmentation <span class="sort-indicator"></span></th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsBody">
+                            <!-- Results will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Your main app JS (must come after all DOM content and after loading noUiSlider in head) -->
-    <script src="app.js"></script>
+    <script>
+        // ZoomInfo Account Data - Updated with new columns
+        const zoomInfoData = [
+          {
+            "Company Name": "Innovative Inc",
+            "Who it is assigned to": "Taylor Smith",
+            "Account Type": "Prospect",
+            "Prospect Score": 90,
+            "Account Notes": "Top 10 account",
+            "Drop Notes": "Do not call",
+            "Website": "www.innovativeinc.com",
+            "LinkedinURL": "https://linkedin.com/company/0",
+            "Revenue Estimate": "$10 mil. - $25 mil.",
+            "# of Employees": 82,
+            "Head Office": "Charlotte, North Carolina",
+            "Country": "United States",
+            "Segmentation": "Mid-Market"
+          },
+          {
+            "Company Name": "Global Corp",
+            "Who it is assigned to": "Taylor Smith",
+            "Account Type": "Suspect",
+            "Prospect Score": 94,
+            "Account Notes": "Strong pipeline",
+            "Drop Notes": "Do not call",
+            "Website": "www.globalcorp.com",
+            "LinkedinURL": "https://linkedin.com/company/1",
+            "Revenue Estimate": "$5 mil. - $10 mil.",
+            "# of Employees": 39,
+            "Head Office": "Raleigh, North Carolina",
+            "Country": "United States",
+            "Segmentation": "Enterprise"
+          },
+          {
+            "Company Name": "Fusion Group",
+            "Who it is assigned to": "Morgan Lee",
+            "Account Type": "Suspect",
+            "Prospect Score": 83,
+            "Account Notes": "Follow-up Q3",
+            "Drop Notes": "Nurture",
+            "Website": "www.fusiongroup.com",
+            "LinkedinURL": "https://linkedin.com/company/2",
+            "Revenue Estimate": "$10 mil. - $25 mil.",
+            "# of Employees": 21,
+            "Head Office": "Henderson, Nevada",
+            "Country": "United States",
+            "Segmentation": "SMB"
+          },
+          {
+            "Company Name": "Momentum Corp",
+            "Who it is assigned to": "Taylor Smith",
+            "Account Type": "Customer",
+            "Prospect Score": 88,
+            "Account Notes": "Repeat outreach",
+            "Drop Notes": "Check in 2026",
+            "Website": "www.momentumcorp.com",
+            "LinkedinURL": "https://linkedin.com/company/3",
+            "Revenue Estimate": "$500,000 - $1 mil.",
+            "# of Employees": 7,
+            "Head Office": "San Antonio, Texas",
+            "Country": "United States",
+            "Segmentation": "Mid-Market"
+          },
+          {
+            "Company Name": "Innovative Systems",
+            "Who it is assigned to": "Jordan Green",
+            "Account Type": "Prospect",
+            "Prospect Score": 89,
+            "Account Notes": "Repeat outreach",
+            "Drop Notes": "Ready if budget",
+            "Website": "www.innovativesystems.com",
+            "LinkedinURL": "https://linkedin.com/company/4",
+            "Revenue Estimate": "$500,000 - $1 mil.",
+            "# of Employees": 9,
+            "Head Office": "Denver, Colorado",
+            "Country": "United States",
+            "Segmentation": "Enterprise"
+          },
+          {
+            "Company Name": "Apex Enterprises",
+            "Who it is assigned to": "Jordan Green",
+            "Account Type": "Prospect",
+            "Prospect Score": 75,
+            "Account Notes": "Repeat outreach",
+            "Drop Notes": "Do not call",
+            "Website": "www.apexenterprises.com",
+            "LinkedinURL": "https://linkedin.com/company/5",
+            "Revenue Estimate": "$10 mil. - $25 mil.",
+            "# of Employees": 40,
+            "Head Office": "Charlotte, North Carolina",
+            "Country": "United States",
+            "Segmentation": "SMB"
+          },
+          {
+            "Company Name": "Velocity Ltd",
+            "Who it is assigned to": "Morgan Lee",
+            "Account Type": "Target",
+            "Prospect Score": 55,
+            "Account Notes": "High potential",
+            "Drop Notes": "Do not call",
+            "Website": "www.velocityltd.com",
+            "LinkedinURL": "https://linkedin.com/company/6",
+            "Revenue Estimate": "Over $5 bil.",
+            "# of Employees": 39993,
+            "Head Office": "Santa Ana, California",
+            "Country": "United States",
+            "Segmentation": "SMB"
+          },
+          {
+            "Company Name": "Future Technologies",
+            "Who it is assigned to": "Morgan Lee",
+            "Account Type": "Target",
+            "Prospect Score": 72,
+            "Account Notes": "Top 10 account",
+            "Drop Notes": "Do not call",
+            "Website": "www.futuretechnologies.com",
+            "LinkedinURL": "https://linkedin.com/company/7",
+            "Revenue Estimate": "$50 mil. - $100 mil.",
+            "# of Employees": 238,
+            "Head Office": "Bakersfield, California",
+            "Country": "United States",
+            "Segmentation": "Mid-Market"
+          },
+          {
+            "Company Name": "Synergy Systems",
+            "Who it is assigned to": "Alex Kim",
+            "Account Type": "Prospect",
+            "Prospect Score": 74,
+            "Account Notes": "Top 10 account",
+            "Drop Notes": "Do not call",
+            "Website": "www.synergysystems.com",
+            "LinkedinURL": "https://linkedin.com/company/8",
+            "Revenue Estimate": "$10 mil. - $25 mil.",
+            "# of Employees": 36,
+            "Head Office": "Columbus, Ohio",
+            "Country": "United States",
+            "Segmentation": "SMB"
+          },
+          {
+            "Company Name": "Pioneer LLC",
+            "Who it is assigned to": "Taylor Smith",
+            "Account Type": "Customer",
+            "Prospect Score": 60,
+            "Account Notes": "High potential",
+            "Drop Notes": "Nurture",
+            "Website": "www.pioneerllc.com",
+            "LinkedinURL": "https://linkedin.com/company/9",
+            "Revenue Estimate": "$10 mil. - $25 mil.",
+            "# of Employees": 55,
+            "Head Office": "Fort Worth, Texas",
+            "Country": "United States",
+            "Segmentation": "SMB"
+          },
+          {
+            "Company Name": "Dynamic Solutions",
+            "Who it is assigned to": "Morgan Lee",
+            "Account Type": "Suspect",
+            "Prospect Score": 97,
+            "Account Notes": "High potential",
+            "Drop Notes": "Ready if budget",
+            "Website": "www.dynamicsolutions.com",
+            "LinkedinURL": "https://linkedin.com/company/10",
+            "Revenue Estimate": "$25 mil. - $50 mil.",
+            "# of Employees": 125,
+            "Head Office": "Seattle, Washington",
+            "Country": "United States",
+            "Segmentation": "Enterprise"
+          },
+          {
+            "Company Name": "Strategic Partners",
+            "Who it is assigned to": "Morgan Lee",
+            "Account Type": "Customer",
+            "Prospect Score": 89,
+            "Account Notes": "Repeat outreach",
+            "Drop Notes": "Nurture",
+            "Website": "www.strategicpartners.com",
+            "LinkedinURL": "https://linkedin.com/company/11",
+            "Revenue Estimate": "$100 mil. - $250 mil.",
+            "# of Employees": 450,
+            "Head Office": "Chicago, Illinois",
+            "Country": "United States",
+            "Segmentation": "Mid-Market"
+          },
+          {
+            "Company Name": "Elite Manufacturing",
+            "Who it is assigned to": "Jordan Green",
+            "Account Type": "Target",
+            "Prospect Score": 58,
+            "Account Notes": "Top 10 account",
+            "Drop Notes": "Do not call",
+            "Website": "www.elitemanufacturing.com",
+            "LinkedinURL": "https://linkedin.com/company/12",
+            "Revenue Estimate": "$250 mil. - $500 mil.",
+            "# of Employees": 1250,
+            "Head Office": "Detroit, Michigan",
+            "Country": "United States",
+            "Segmentation": "SMB"
+          },
+          {
+            "Company Name": "Digital Media Group",
+            "Who it is assigned to": "Alex Kim",
+            "Account Type": "Target",
+            "Prospect Score": 69,
+            "Account Notes": "Repeat outreach",
+            "Drop Notes": "Nurture",
+            "Website": "www.digitalmediagroup.com",
+            "LinkedinURL": "https://linkedin.com/company/13",
+            "Revenue Estimate": "$50 mil. - $100 mil.",
+            "# of Employees": 180,
+            "Head Office": "Los Angeles, California",
+            "Country": "United States",
+            "Segmentation": "Mid-Market"
+          },
+          {
+            "Company Name": "Healthcare Innovations",
+            "Who it is assigned to": "Jordan Green",
+            "Account Type": "Prospect",
+            "Prospect Score": 68,
+            "Account Notes": "Strong pipeline",
+            "Drop Notes": "Do not call",
+            "Website": "www.healthcareinnovations.com",
+            "LinkedinURL": "https://linkedin.com/company/14",
+            "Revenue Estimate": "$100 mil. - $250 mil.",
+            "# of Employees": 650,
+            "Head Office": "Boston, Massachusetts",
+            "Country": "United States",
+            "Segmentation": "Mid-Market"
+          },
+          {
+            "Company Name": "Energy Solutions Inc",
+            "Who it is assigned to": "Jordan Green",
+            "Account Type": "Suspect",
+            "Prospect Score": 59,
+            "Account Notes": "Follow-up Q3",
+            "Drop Notes": "Check in 2026",
+            "Website": "www.energysolutionsinc.com",
+            "LinkedinURL": "https://linkedin.com/company/15",
+            "Revenue Estimate": "$500 mil. - $1 bil.",
+            "# of Employees": 2800,
+            "Head Office": "Houston, Texas",
+            "Country": "United States",
+            "Segmentation": "Enterprise"
+          },
+          {
+            "Company Name": "Construction Masters",
+            "Who it is assigned to": "Taylor Smith",
+            "Account Type": "Customer",
+            "Prospect Score": 95,
+            "Account Notes": "Repeat outreach",
+            "Drop Notes": "Check in 2026",
+            "Website": "www.constructionmasters.com",
+            "LinkedinURL": "https://linkedin.com/company/16",
+            "Revenue Estimate": "$25 mil. - $50 mil.",
+            "# of Employees": 95,
+            "Head Office": "Phoenix, Arizona",
+            "Country": "United States",
+            "Segmentation": "Enterprise"
+          },
+          {
+            "Company Name": "Telecom Networks",
+            "Who it is assigned to": "Taylor Smith",
+            "Account Type": "Suspect",
+            "Prospect Score": 71,
+            "Account Notes": "Top 10 account",
+            "Drop Notes": "Nurture",
+            "Website": "www.telecomnetworks.com",
+            "LinkedinURL": "https://linkedin.com/company/17",
+            "Revenue Estimate": "$100 mil. - $250 mil.",
+            "# of Employees": 520,
+            "Head Office": "Atlanta, Georgia",
+            "Country": "United States",
+            "Segmentation": "SMB"
+          },
+          {
+            "Company Name": "Real Estate Pros",
+            "Who it is assigned to": "Jordan Green",
+            "Account Type": "Suspect",
+            "Prospect Score": 87,
+            "Account Notes": "Strong pipeline",
+            "Drop Notes": "Ready if budget",
+            "Website": "www.realestatepros.com",
+            "LinkedinURL": "https://linkedin.com/company/18",
+            "Revenue Estimate": "$10 mil. - $25 mil.",
+            "# of Employees": 35,
+            "Head Office": "Miami, Florida",
+            "Country": "United States",
+            "Segmentation": "Mid-Market"
+          },
+          {
+            "Company Name": "Retail Giants",
+            "Who it is assigned to": "Alex Kim",
+            "Account Type": "Suspect",
+            "Prospect Score": 79,
+            "Account Notes": "Strong pipeline",
+            "Drop Notes": "Ready if budget",
+            "Website": "www.retailgiants.com",
+            "LinkedinURL": "https://linkedin.com/company/19",
+            "Revenue Estimate": "$250 mil. - $500 mil.",
+            "# of Employees": 1800,
+            "Head Office": "Minneapolis, Minnesota",
+            "Country": "United States",
+            "Segmentation": "SMB"
+          }
+        ];
+
+        let filteredData = [...zoomInfoData];
+        let currentSortColumn = null;
+        let currentSortDirection = 'asc';
+
+        let revenueFilter, minEmployeesInput, maxEmployeesInput, locationFilter,
+            searchInput, resultsBody, resultsCount, clearFiltersBtn, exportDataBtn, loadingIndicator;
+
+        // ========= INIT ==========
+        document.addEventListener('DOMContentLoaded', function () {
+            revenueFilter = document.getElementById('revenueFilter');
+            minEmployeesInput = document.getElementById('minEmployees');
+            maxEmployeesInput = document.getElementById('maxEmployees');
+            locationFilter = document.getElementById('locationFilter');
+            searchInput = document.getElementById('searchInput');
+            resultsBody = document.getElementById('resultsBody');
+            resultsCount = document.getElementById('resultsCount');
+            clearFiltersBtn = document.getElementById('clearFilters');
+            exportDataBtn = document.getElementById('exportData');
+            loadingIndicator = document.getElementById('loadingIndicator');
+
+            populateLocationFilter();
+            attachEventListeners();
+            filteredData = [...zoomInfoData];
+            renderTable();
+        });
+
+        // ======= FILTER =======
+        function handleFilterChange() {
+            showLoading();
+            setTimeout(() => {
+                applyAllFilters();
+                hideLoading();
+            }, 50);
+        }
+
+        function applyAllFilters() {
+            let data = [...zoomInfoData];
+
+            // Revenue
+            const selectedRevenues = getSelectedOptions(revenueFilter);
+            if (selectedRevenues.length > 0) {
+                data = data.filter(item => selectedRevenues.includes(item['Revenue Estimate']));
+            }
+
+            // Employee count
+            const minEmployees = parseInt(minEmployeesInput.value) || 0;
+            const maxEmployees = parseInt(maxEmployeesInput.value) || Number.MAX_SAFE_INTEGER;
+            data = data.filter(item => {
+                const empCount = item['# of Employees'];
+                return empCount >= minEmployees && empCount <= maxEmployees;
+            });
+
+            // Location
+            const selectedCities = getSelectedOptions(locationFilter);
+            if (selectedCities.length > 0) {
+                data = data.filter(item => {
+                    const city = item['Head Office'].split(',')[0].trim();
+                    return selectedCities.includes(city);
+                });
+            }
+
+            // Search filter
+            const searchTerm = searchInput.value.trim().toLowerCase();
+            if (searchTerm) {
+                data = data.filter(item => {
+                    return Object.values(item).some(value =>
+                        String(value).toLowerCase().includes(searchTerm)
+                    );
+                });
+            }
+
+            filteredData = data;
+
+            if (currentSortColumn) {
+                applySorting();
+            }
+
+            renderTable();
+        }
+
+        function getSelectedOptions(selectElement) {
+            return Array.from(selectElement.selectedOptions).map(option => option.value);
+        }
+
+        // ======= SORTING & CLEAR =======
+        function clearAllFilters() {
+            revenueFilter.selectedIndex = -1;
+            locationFilter.selectedIndex = -1;
+            minEmployeesInput.value = '';
+            maxEmployeesInput.value = '';
+            searchInput.value = '';
+            currentSortColumn = null;
+            currentSortDirection = 'asc';
+            updateSortIndicators();
+            filteredData = [...zoomInfoData];
+            renderTable();
+        }
+
+        function sortTable(column) {
+            if (currentSortColumn === column) {
+                currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSortColumn = column;
+                currentSortDirection = 'asc';
+            }
+            applySorting();
+            renderTable();
+            updateSortIndicators();
+        }
+
+        function applySorting() {
+            filteredData.sort((a, b) => {
+                let aVal, bVal;
+                if (currentSortColumn === '# of Employees') {
+                    aVal = Number(a['# of Employees']);
+                    bVal = Number(b['# of Employees']);
+                } else if (currentSortColumn === 'Prospect Score') {
+                    aVal = Number(a['Prospect Score']);
+                    bVal = Number(b['Prospect Score']);
+                } else {
+                    aVal = a[currentSortColumn];
+                    bVal = b[currentSortColumn];
+                }
+                if (typeof aVal === 'string' && typeof bVal === 'string') {
+                    aVal = aVal.toLowerCase();
+                    bVal = bVal.toLowerCase();
+                }
+                if (aVal < bVal) return currentSortDirection === 'asc' ? -1 : 1;
+                if (aVal > bVal) return currentSortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
+
+        function updateSortIndicators() {
+            document.querySelectorAll('.sort-indicator').forEach(indicator => {
+                indicator.className = 'sort-indicator';
+            });
+            if (currentSortColumn) {
+                const indicator = document.querySelector(`[data-sort="${currentSortColumn}"] .sort-indicator`);
+                if (indicator) {
+                    indicator.classList.add(currentSortDirection);
+                }
+            }
+        }
+
+        // ======= TABLE =======
+        function renderTable() {
+            if (!resultsBody) return;
+            resultsBody.innerHTML = '';
+            if (filteredData.length === 0) {
+                resultsBody.innerHTML = `<tr>
+                    <td colspan="13" class="no-results">
+                        <h3>No accounts found</h3>
+                        <p>Try adjusting your filters to see more results.</p>
+                    </td>
+                </tr>`;
+                updateResultsCount(0);
+                return;
+            }
+
+            filteredData.forEach(item => {
+                const row = document.createElement('tr');
+                const website = item.Website.startsWith('http') ? item.Website : `https://${item.Website}`;
+                const linkedinURL = item.LinkedinURL || '#';
+                row.innerHTML = `
+                    <td><strong>${escapeHtml(item['Company Name'])}</strong></td>
+                    <td>${escapeHtml(item['Who it is assigned to'] || 'Unassigned')}</td>
+                    <td><span class="status status--info">${escapeHtml(item['Account Type'] || 'N/A')}</span></td>
+                    <td><span style="${getScoreStyle(item['Prospect Score'])}">${item['Prospect Score'] || 'N/A'}</span></td>
+                    <td>${escapeHtml(item['Account Notes'] || '')}</td>
+                    <td>${escapeHtml(item['Drop Notes'] || '')}</td>
+                    <td><a href="${website}" target="_blank">${escapeHtml(item.Website)}</a></td>
+                    <td>${item.LinkedinURL ? `<a href="${linkedinURL}" target="_blank">LinkedIn</a>` : 'N/A'}</td>
+                    <td><span class="${getRevenueClass(item['Revenue Estimate'])}">${escapeHtml(item['Revenue Estimate'])}</span></td>
+                    <td>${item['# of Employees'].toLocaleString()}</td>
+                    <td>${escapeHtml(item['Head Office'])}</td>
+                    <td>${escapeHtml(item.Country)}</td>
+                    <td><span class="status status--success">${escapeHtml(item.Segmentation || 'N/A')}</span></td>
+                `;
+                resultsBody.appendChild(row);
+            });
+            updateResultsCount(filteredData.length);
+            highlightSearchTerms();
+        }
+
+        function getScoreStyle(score) {
+            // Soft pastel readable badge
+            let normalized = Math.max(0, Math.min(100, score)) / 100;
+            let hue = 0 + 120 * normalized;
+            let saturation = 38;
+            let lightness = 91;
+            let textColor = '#1a1a1a';
+            return `background-color: hsl(${hue},${saturation}%,${lightness}%); color: ${textColor}; font-weight: bold; font-size: 1.05em; padding: 6px 10px; border-radius: 6px; min-width: 38px; display: inline-block; text-align: center; letter-spacing: 0.5px;`;
+        }
+
+        function getRevenueClass(revenue) {
+            if (revenue.includes('bil.') || revenue.includes('$500 mil. - $1 bil.') || revenue.includes('$250 mil. - $500 mil.') || revenue.includes('$100 mil. - $250 mil.')) {
+                return 'revenue-high';
+            } else if (revenue.includes('$50 mil.') || revenue.includes('$25 mil.')) {
+                return 'revenue-medium';
+            }
+            return 'revenue-low';
+        }
+
+        // ======= CSV EXPORT, COUNTERS, ETC. =======
+        function exportToCSV() {
+            if (filteredData.length === 0) {
+                alert('No data to export. Please adjust your filters.');
+                return;
+            }
+            const headers = [
+                'Company Name', 'Assigned To', 'Account Type', 'Prospect Score', 'Account Notes',
+                'Drop Notes', 'Website', 'LinkedIn URL', 'Revenue Estimate', 'Employees',
+                'Head Office', 'Country', 'Segmentation'
+            ];
+            const csvRows = [
+                headers.join(','),
+                ...filteredData.map(item => headers.map(header => {
+                    const field = getCSVValue(item, header);
+                    return `"${field.replace(/"/g, '""')}"`;
+                }).join(','))
+            ];
+            const csvContent = csvRows.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `zoominfo_accounts_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function getCSVValue(item, key) {
+            switch (key) {
+                case 'Company Name': return item['Company Name'];
+                case 'Assigned To': return item['Who it is assigned to'];
+                case 'Account Type': return item['Account Type'];
+                case 'Prospect Score': return String(item['Prospect Score']);
+                case 'Account Notes': return item['Account Notes'];
+                case 'Drop Notes': return item['Drop Notes'];
+                case 'Website': return item.Website;
+                case 'LinkedIn URL': return item.LinkedinURL;
+                case 'Revenue Estimate': return item['Revenue Estimate'];
+                case 'Employees': return String(item['# of Employees']);
+                case 'Head Office': return item['Head Office'];
+                case 'Country': return item.Country;
+                case 'Segmentation': return item.Segmentation;
+                default: return '';
+            }
+        }
+
+        function updateResultsCount(count) {
+            if (resultsCount) {
+                const total = zoomInfoData.length;
+                resultsCount.textContent = `${count.toLocaleString()} of ${total.toLocaleString()} accounts found`;
+            }
+        }
+
+        // ======= UTILS & UI HELPERS =======
+        function highlightSearchTerms() {
+            const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
+            if (!searchTerm) return;
+            const regex = new RegExp(escapeRegex(searchTerm), 'gi');
+            resultsBody.querySelectorAll('td').forEach(cell => {
+                if (cell.querySelector('a')) return; // Don't break links
+                const text = cell.textContent;
+                if (regex.test(text)) {
+                    cell.innerHTML = text.replace(regex, match =>
+                        `<span class="search-highlight">${match}</span>`
+                    );
+                }
+            });
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+            };
+            return String(text).replace(/[&<>"']/g, m => map[m]);
+        }
+
+        function escapeRegex(string) {
+            return String(string).replace(/[.*+?^${}()|[\]\\]/g, '\\            // Search filter
+            const searchTerm = searchInput.value.trim().toLowerCase();
+            if (searchTerm) {
+                data = data.filter(item');
+        }
+
+        function showLoading() {
+            if (loadingIndicator) loadingIndicator.classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            if (loadingIndicator) loadingIndicator.classList.add('hidden');
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => { clearTimeout(timeout); func(...args); };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // ======= EVENT WIRING =======
+        function attachEventListeners() {
+            revenueFilter.addEventListener('change', handleFilterChange);
+            locationFilter.addEventListener('change', handleFilterChange);
+            minEmployeesInput.addEventListener('input', debounce(handleFilterChange, 300));
+            maxEmployeesInput.addEventListener('input', debounce(handleFilterChange, 300));
+            searchInput.addEventListener('input', debounce(handleFilterChange, 300));
+            clearFiltersBtn.addEventListener('click', clearAllFilters);
+            exportDataBtn.addEventListener('click', exportToCSV);
+            document.querySelectorAll('[data-sort]').forEach(header => {
+                header.addEventListener('click', () => sortTable(header.dataset.sort));
+            });
+        }
+
+        function populateLocationFilter() {
+            const uniqueCities = [
+                ...new Set(
+                    zoomInfoData
+                        .map(item => {
+                            const headOffice = item['Head Office'] || '';
+                            return headOffice.split(',')[0].trim();
+                        })
+                        .filter(city => city)
+                )
+            ].sort();
+            locationFilter.innerHTML = '';
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'All Locations';
+            locationFilter.appendChild(defaultOption);
+            uniqueCities.forEach(city => {
+                const option = document.createElement('option');
+                option.value = city;
+                option.textContent = city;
+                locationFilter.appendChild(option);
+            });
+        }
+    </script>
 </body>
 </html>
