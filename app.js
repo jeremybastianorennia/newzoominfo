@@ -1,3 +1,18 @@
+document.addEventListener('DOMContentLoaded', function () {
+  const correctPassword = 'flames'; // Replace with your password
+  let userInput = prompt('Enter password to access the dashboard:');
+  while (userInput !== correctPassword) {
+    userInput = prompt('Incorrect password. Please try again:');
+  }
+
+  // Place the rest of your dashboard initialization code here
+  Papa.parse('data.csv', {
+    // ... rest of your code ...
+  });
+});
+
+
+
 let zoomInfoData = [];
 let filteredData = [];
 let currentSortColumn = null;
