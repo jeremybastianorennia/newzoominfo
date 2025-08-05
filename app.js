@@ -3,7 +3,7 @@ let filteredData = [];
 let currentSortColumn = null;
 let currentSortDirection = 'asc';
 
-let revenueFilter, minEmployeesInput, maxEmployeesInput, segmentationFilter, assignedToFilter,
+let revenueFilter, minEmployeesInput, maxEmployeesInput, locationFilter,
     searchInput, resultsBody, resultsCount, clearFiltersBtn, exportDataBtn, loadingIndicator;
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -25,8 +25,7 @@ function initializeDashboard() {
     revenueFilter = document.getElementById('revenueFilter');
     minEmployeesInput = document.getElementById('minEmployees');
     maxEmployeesInput = document.getElementById('maxEmployees');
-    segmentationFilter = document.getElementById('segmentationFilter');
-    assignedToFilter = document.getElementById('assignedToFilter');
+    locationFilter = document.getElementById('locationFilter');
     searchInput = document.getElementById('searchInput');
     resultsBody = document.getElementById('resultsBody');
     resultsCount = document.getElementById('resultsCount');
@@ -34,8 +33,7 @@ function initializeDashboard() {
     exportDataBtn = document.getElementById('exportData');
     loadingIndicator = document.getElementById('loadingIndicator');
 
-    populateSegmentationFilter();
-    populateAssignedToFilter();
+    populateLocationFilter();
     attachEventListeners();
 
     filteredData = [...zoomInfoData];
@@ -49,7 +47,6 @@ function handleFilterChange() {
         hideLoading();
     }, 50);
 }
-
 function applyAllFilters() {
     let data = [...zoomInfoData];
     const selectedRevenues = getSelectedOptions(revenueFilter);
@@ -64,14 +61,12 @@ function applyAllFilters() {
         return empCount >= minEmployees && empCount <= maxEmployees;
     });
 
-    const selectedSegments = getSelectedOptions(segmentationFilter);
-    if (selectedSegments.length > 0) {
-        data = data.filter(item => selectedSegments.includes(item['Segmentation']));
-    }
-
-    const selectedAssignedTos = getSelectedOptions(assignedToFilter);
-    if (selectedAssignedTos.length > 0) {
-        data = data.filter(item => selectedAssignedTos.includes(item['Assigned To']));
+    const selectedCities = getSelectedOptions(locationFilter);
+    if (selectedCities.length > 0) {
+        data = data.filter(item => {
+            const city = (item['Head Office'] || '').split(',')[0].trim();
+            return selectedCities.includes(city);
+        });
     }
 
     const searchTerm = searchInput.value.trim().toLowerCase();
@@ -95,8 +90,7 @@ function getSelectedOptions(selectElement) {
 
 function clearAllFilters() {
     revenueFilter.selectedIndex = -1;
-    segmentationFilter.selectedIndex = -1;
-    assignedToFilter.selectedIndex = -1;
+    locationFilter.selectedIndex = -1;
     minEmployeesInput.value = '';
     maxEmployeesInput.value = '';
     searchInput.value = '';
@@ -148,6 +142,7 @@ function updateSortIndicators() {
 function renderTable() {
     if (!resultsBody) return;
     resultsBody.innerHTML = '';
+
     if (filteredData.length === 0) {
         resultsBody.innerHTML = `<tr>
             <td colspan="13" class="no-results">
@@ -158,6 +153,7 @@ function renderTable() {
         updateResultsCount(0);
         return;
     }
+
     filteredData.forEach(item => {
         const row = document.createElement('tr');
         const website = (item['Website'] || '').startsWith('http') ? item['Website'] : `https://${item['Website']}`;
@@ -279,8 +275,7 @@ function debounce(func, wait) {
 }
 function attachEventListeners() {
     revenueFilter.addEventListener('change', handleFilterChange);
-    segmentationFilter.addEventListener('change', handleFilterChange);
-    assignedToFilter.addEventListener('change', handleFilterChange);
+    locationFilter.addEventListener('change', handleFilterChange);
     minEmployeesInput.addEventListener('input', debounce(handleFilterChange, 300));
     maxEmployeesInput.addEventListener('input', debounce(handleFilterChange, 300));
     searchInput.addEventListener('input', debounce(handleFilterChange, 300));
@@ -290,36 +285,26 @@ function attachEventListeners() {
         header.addEventListener('click', () => sortTable(header.dataset.sort));
     });
 }
-
-function populateSegmentationFilter() {
-    const uniqueSegments = [
+function populateLocationFilter() {
+    const uniqueCities = [
         ...new Set(
             zoomInfoData
-                .map(item => item['Segmentation'] || '')
-                .filter(seg => seg)
+                .map(item => {
+                    const headOffice = item['Head Office'] || '';
+                    return headOffice.split(',')[0].trim();
+                })
+                .filter(city => city)
         )
     ].sort();
-    segmentationFilter.innerHTML = '';
-    uniqueSegments.forEach(seg => {
+    locationFilter.innerHTML = '';
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'All Locations';
+    locationFilter.appendChild(defaultOption);
+    uniqueCities.forEach(city => {
         const option = document.createElement('option');
-        option.value = seg;
-        option.textContent = seg;
-        segmentationFilter.appendChild(option);
-    });
-}
-function populateAssignedToFilter() {
-    const uniqueAssigned = [
-        ...new Set(
-            zoomInfoData
-                .map(item => item['Assigned To'] || '')
-                .filter(name => name)
-        )
-    ].sort();
-    assignedToFilter.innerHTML = '';
-    uniqueAssigned.forEach(name => {
-        const option = document.createElement('option');
-        option.value = name;
-        option.textContent = name;
-        assignedToFilter.appendChild(option);
+        option.value = city;
+        option.textContent = city;
+        locationFilter.appendChild(option);
     });
 }
